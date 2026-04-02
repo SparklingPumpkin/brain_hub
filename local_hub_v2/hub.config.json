@@ -1,0 +1,12 @@
+{
+  "host": "127.0.0.1",
+  "port": 8765,
+  "root_dir": "./workflow_bridge",
+  "auto_dispatch": false,
+  "default_dispatch_mode": "local_adapter",
+  "codex_adapter_cmd": "node ./adapters/mock-codex-adapter.js",
+  "allow_remote_worker": false,
+  "approval_policy": "manual_on_risk",
+  "log_level": "info",
+  "version": "v2-alpha"
+}
