@@ -1,0 +1,11 @@
+{
+  "source": "web",
+  "packet": "project_id: demo\ncycle_id: 001\nstage: strategy\ngoal: 测试浏览器扩展是否能抓取上下文块_测试6 \nconstraints:\n  - 不要输出代码块之外的任何内容\nnext_action: codex_execute",
+  "meta": {
+    "capturedAt": "2026-04-02T05:01:00.333Z",
+    "pageUrl": "https://chatgpt.com/c/69cde510-3dc4-83a7-90d4-2b6f5641b31f",
+    "pageTitle": "浏览器扩展测试",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0",
+    "tabId": 872628583
+  }
+}

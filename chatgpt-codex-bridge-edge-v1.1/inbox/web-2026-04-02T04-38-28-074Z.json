@@ -1,0 +1,4 @@
+{
+  "source": "sw-manual",
+  "packet": "project_id: demo\ncycle_id: 001\nstage: strategy\ngoal: sw manual test\nnext_action: codex_execute"
+}

@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "adapter:mock": "node adapters/mock-codex-adapter.js",
+    "adapter:real": "node adapters/real-codex-adapter.js",
     "test": "node --test"
   }
 }

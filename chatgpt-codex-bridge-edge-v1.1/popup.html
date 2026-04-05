@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChatGPT Codex Bridge</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="popup-shell">
+    <header class="hero">
+      <p class="eyebrow">Local Hub Bridge</p>
+      <h1>ChatGPT Codex Bridge</h1>
+      <p class="subtitle">Send strategy packets to the local Hub and read back the latest run state.</p>
+    </header>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Hub</h2>
+        <span id="hub-pill" class="pill pill-neutral">Checking</span>
+      </div>
+      <p id="hub-summary" class="mono small">Waiting for background refresh...</p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Latest Packet</h2>
+        <span id="packet-pill" class="pill pill-neutral">Idle</span>
+      </div>
+      <div class="kv-list">
+        <div><span>Project</span><strong id="packet-project">-</strong></div>
+        <div><span>Cycle</span><strong id="packet-cycle">-</strong></div>
+        <div><span>Stage</span><strong id="packet-stage">-</strong></div>
+      </div>
+      <p id="packet-goal" class="small">No packet captured yet.</p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Run State</h2>
+        <span id="run-pill" class="pill pill-neutral">Unknown</span>
+      </div>
+      <div class="kv-list">
+        <div><span>Status</span><strong id="run-status">-</strong></div>
+        <div><span>Active Cycle</span><strong id="run-cycle">-</strong></div>
+        <div><span>Updated</span><strong id="run-updated">-</strong></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Latest Execution</h2>
+      </div>
+      <ul id="execution-summary" class="list">
+        <li>No execution report yet.</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Next Step</h2>
+      </div>
+      <p id="context-next" class="small">No context pack yet.</p>
+    </section>
+
+    <section class="actions">
+      <button id="refresh-button" type="button">Refresh</button>
+      <button id="dispatch-button" type="button">Dispatch Latest Run</button>
+    </section>
+
+    <p id="status-line" class="small muted">Popup ready.</p>
+  </main>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
