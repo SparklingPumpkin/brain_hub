@@ -1,7 +1,7 @@
 const HUB_BASE_URL = 'http://127.0.0.1:8765';
 const STORAGE_KEY = 'bridgeState';
 
-function defaultBridgeState() {
+export function defaultBridgeState() {
   return {
     hub: {
       baseUrl: HUB_BASE_URL,
@@ -13,11 +13,22 @@ function defaultBridgeState() {
     },
     lastPacket: null,
     lastSubmission: null,
-    projectSnapshot: null
+    projectSnapshot: null,
+    settings: {
+      autoDispatch: false,
+      returnResultsToChatGpt: true
+    },
+    loopback: {
+      lastContextPackId: null,
+      deliveredAt: null,
+      tabId: null,
+      status: 'idle',
+      error: null
+    }
   };
 }
 
-function parsePacketFields(packetText) {
+export function parsePacketFields(packetText) {
   const text = String(packetText || '');
   const getField = (fieldName) => {
     const match = text.match(new RegExp(`^${fieldName}:\\s*(.+)$`, 'm'));
@@ -33,20 +44,33 @@ function parsePacketFields(packetText) {
   };
 }
 
-async function readBridgeState() {
-  const result = await chrome.storage.local.get(STORAGE_KEY);
+export function normalizeState(state) {
   return {
     ...defaultBridgeState(),
-    ...(result[STORAGE_KEY] || {})
+    ...(state || {}),
+    settings: {
+      ...defaultBridgeState().settings,
+      ...(state?.settings || {})
+    },
+    loopback: {
+      ...defaultBridgeState().loopback,
+      ...(state?.loopback || {})
+    }
   };
 }
 
+async function readBridgeState() {
+  const result = await chrome.storage.local.get(STORAGE_KEY);
+  return normalizeState(result[STORAGE_KEY]);
+}
+
 async function writeBridgeState(nextState) {
+  const normalized = normalizeState(nextState);
   await chrome.storage.local.set({
-    [STORAGE_KEY]: nextState
+    [STORAGE_KEY]: normalized
   });
-  await syncActionState(nextState);
-  return nextState;
+  await syncActionState(normalized);
+  return normalized;
 }
 
 function parseJsonSafely(text) {
@@ -116,14 +140,14 @@ async function fetchProjectSnapshot(projectId) {
     refreshedAt: new Date().toISOString()
   };
 
-  if (snapshot.state && snapshot.state.latest_execution_packet_id) {
+  if (snapshot.state?.latest_execution_packet_id) {
     const executionResponse = await fetchHub(`/projects/${encodedProjectId}/latest-execution`);
     if (executionResponse.ok && executionResponse.body && typeof executionResponse.body === 'object') {
       snapshot.latestExecution = executionResponse.body.packet ?? null;
     }
   }
 
-  if (snapshot.state && snapshot.state.latest_context_pack_id) {
+  if (snapshot.state?.latest_context_pack_id) {
     const contextResponse = await fetchHub(`/projects/${encodedProjectId}/latest-context-pack`);
     if (contextResponse.ok && contextResponse.body && typeof contextResponse.body === 'object') {
       snapshot.latestContextPack = contextResponse.body.packet ?? null;
@@ -133,9 +157,123 @@ async function fetchProjectSnapshot(projectId) {
   return snapshot;
 }
 
+function getProjectState(projectSnapshot) {
+  return projectSnapshot?.state ?? null;
+}
+
+function renderLoopbackSection(title, items, fallback = '- none') {
+  const normalizedItems = Array.isArray(items) && items.length > 0
+    ? items.map((item) => `- ${item}`)
+    : [fallback];
+  return `${title}:\n${normalizedItems.join('\n')}`;
+}
+
+export function buildLoopbackPrompt(state) {
+  const projectState = getProjectState(state.projectSnapshot);
+  const execution = state.projectSnapshot?.latestExecution?.parsed ?? null;
+  const contextPack = state.projectSnapshot?.latestContextPack?.parsed ?? null;
+  const projectId = projectState?.project_id ?? state.lastPacket?.projectId ?? 'unknown_project';
+  const cycleId = projectState?.active_cycle_id ?? state.lastPacket?.cycleId ?? 'unknown_cycle';
+  const status = projectState?.current_status ?? 'unknown';
+
+  return [
+    `Local Hub completed a run for project ${projectId} cycle ${cycleId}.`,
+    'Please use this as the latest execution context for this ChatGPT thread.',
+    'Summarize it briefly if helpful, then wait for the next user instruction.',
+    'Do not emit a new context-packet unless the user explicitly asks for one.',
+    '',
+    '```local-hub-context',
+    `project_id: ${projectId}`,
+    `cycle_id: ${cycleId}`,
+    `status: ${status}`,
+    renderLoopbackSection('summary', execution?.summary),
+    renderLoopbackSection('verification', execution?.verification),
+    renderLoopbackSection('open_issues', execution?.open_issues),
+    renderLoopbackSection('risks', execution?.risks),
+    renderLoopbackSection('completed', contextPack?.completed),
+    renderLoopbackSection('key_files', contextPack?.key_files),
+    `suggested_next_step: ${contextPack?.suggested_next_step || 'None provided.'}`,
+    `web_recovery_prompt: ${contextPack?.web_recovery_prompt || 'None provided.'}`,
+    '```'
+  ].join('\n');
+}
+
+async function deliverLoopbackPrompt(tabId, text) {
+  if (!tabId || !chrome.tabs?.sendMessage) {
+    return {
+      ok: false,
+      error: 'No ChatGPT tab available for loopback delivery'
+    };
+  }
+
+  try {
+    const response = await chrome.tabs.sendMessage(tabId, {
+      type: 'INSERT_CHATGPT_MESSAGE',
+      payload: {
+        text,
+        autoSubmit: true
+      }
+    });
+
+    if (!response || typeof response !== 'object') {
+      return { ok: true };
+    }
+
+    return response;
+  } catch (error) {
+    return {
+      ok: false,
+      error: String(error)
+    };
+  }
+}
+
+async function maybeLoopbackToChatGpt(state) {
+  const normalized = normalizeState(state);
+
+  if (!normalized.settings.returnResultsToChatGpt) {
+    return normalized;
+  }
+
+  const projectState = getProjectState(normalized.projectSnapshot);
+  const contextPackId = normalized.projectSnapshot?.latestContextPack?.packet_id ?? null;
+  const tabId = normalized.lastPacket?.tabId ?? null;
+
+  if (
+    !contextPackId ||
+    !tabId ||
+    !['completed', 'needs_review', 'blocked'].includes(projectState?.current_status)
+  ) {
+    return normalized;
+  }
+
+  if (normalized.loopback.lastContextPackId === contextPackId) {
+    return normalized;
+  }
+
+  const delivery = await deliverLoopbackPrompt(tabId, buildLoopbackPrompt(normalized));
+  const nextState = {
+    ...normalized,
+    loopback: {
+      lastContextPackId: contextPackId,
+      deliveredAt: new Date().toISOString(),
+      tabId,
+      status: delivery.ok ? 'delivered' : 'failed',
+      error: delivery.ok ? null : delivery.error || 'Unknown loopback delivery error'
+    }
+  };
+
+  await writeBridgeState(nextState);
+  return nextState;
+}
+
 async function refreshBridgeState(projectIdOverride = null) {
   const current = await readBridgeState();
-  const projectId = projectIdOverride || current.lastPacket?.projectId || current.projectSnapshot?.state?.project_id || null;
+  const projectId =
+    projectIdOverride ||
+    current.lastPacket?.projectId ||
+    current.projectSnapshot?.state?.project_id ||
+    null;
   const hub = await fetchHubHealth();
 
   const nextState = {
@@ -191,6 +329,25 @@ async function syncActionState(state) {
   await chrome.action.setBadgeBackgroundColor({ color: badgeColor });
   await chrome.action.setBadgeText({ text: badgeText });
   await chrome.action.setTitle({ title });
+}
+
+async function dispatchRun({ projectId, cycleId }) {
+  const response = await fetchHub(`/runs/${encodeURIComponent(projectId)}/${encodeURIComponent(cycleId)}/dispatch`, {
+    method: 'POST'
+  });
+
+  let refreshed = await refreshBridgeState(projectId);
+  refreshed = await writeBridgeState({
+    ...refreshed,
+    lastSubmission: {
+      ...(refreshed.lastSubmission || {}),
+      lastDispatchAt: new Date().toISOString(),
+      lastDispatchResponse: response
+    }
+  });
+
+  await maybeLoopbackToChatGpt(refreshed);
+  return response;
 }
 
 async function handleWebContextPacket(message, sender) {
@@ -255,22 +412,36 @@ async function handleWebContextPacket(message, sender) {
     console.log('[bridge sw] localhost response status =', response.status);
     console.log('[bridge sw] localhost response body =', response.body);
 
-    const refreshed = await refreshBridgeState(packetFields.projectId);
-    const finalState = {
+    let refreshed = await refreshBridgeState(packetFields.projectId);
+    let dispatchResponse = null;
+
+    if (refreshed.settings.autoDispatch && packetFields.projectId && packetFields.cycleId) {
+      dispatchResponse = await dispatchRun({
+        projectId: packetFields.projectId,
+        cycleId: packetFields.cycleId
+      });
+      refreshed = await readBridgeState();
+    }
+
+    const finalState = await writeBridgeState({
       ...refreshed,
       lastSubmission: {
         ok: response.ok,
         status: response.status,
         body: response.body,
-        submittedAt: new Date().toISOString()
+        submittedAt: new Date().toISOString(),
+        autoDispatched: Boolean(dispatchResponse),
+        lastDispatchResponse: dispatchResponse
       }
-    };
-    await writeBridgeState(finalState);
+    });
+
+    await maybeLoopbackToChatGpt(finalState);
 
     return {
       ok: response.ok,
       status: response.status,
-      body: response.body
+      body: response.body,
+      dispatch: dispatchResponse
     };
   } catch (error) {
     const failed = {
@@ -302,8 +473,14 @@ async function handleRefreshBridgeState(message) {
 
 async function handleDispatchRun(message) {
   const current = await readBridgeState();
-  const projectId = message.projectId ?? current.lastPacket?.projectId ?? current.projectSnapshot?.state?.project_id;
-  const cycleId = message.cycleId ?? current.lastPacket?.cycleId ?? current.projectSnapshot?.state?.active_cycle_id;
+  const projectId =
+    message.projectId ??
+    current.lastPacket?.projectId ??
+    current.projectSnapshot?.state?.project_id;
+  const cycleId =
+    message.cycleId ??
+    current.lastPacket?.cycleId ??
+    current.projectSnapshot?.state?.active_cycle_id;
 
   if (!projectId || !cycleId) {
     return {
@@ -312,79 +489,90 @@ async function handleDispatchRun(message) {
     };
   }
 
-  const response = await fetchHub(`/runs/${encodeURIComponent(projectId)}/${encodeURIComponent(cycleId)}/dispatch`, {
-    method: 'POST'
-  });
-
-  const refreshed = await refreshBridgeState(projectId);
-  const nextState = {
-    ...refreshed,
-    lastSubmission: {
-      ...(refreshed.lastSubmission || {}),
-      lastDispatchAt: new Date().toISOString(),
-      lastDispatchResponse: response
-    }
-  };
-  await writeBridgeState(nextState);
-
-  return response;
+  return dispatchRun({ projectId, cycleId });
 }
 
-chrome.runtime.onInstalled.addListener(() => {
-  console.log('ChatGPT Codex Bridge for Edge installed.');
-  refreshBridgeState().catch((error) => {
-    console.error('[bridge sw] failed to initialize bridge state:', error);
-  });
-});
-
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (!message || !message.type) {
-    return false;
-  }
-
-  (async () => {
-    try {
-      if (message.type === 'WEB_CONTEXT_PACKET') {
-        sendResponse(await handleWebContextPacket(message, sender));
-        return;
-      }
-
-      if (message.type === 'GET_BRIDGE_STATE') {
-        sendResponse(await handleGetBridgeState());
-        return;
-      }
-
-      if (message.type === 'REFRESH_BRIDGE_STATE') {
-        sendResponse(await handleRefreshBridgeState(message));
-        return;
-      }
-
-      if (message.type === 'DISPATCH_RUN') {
-        sendResponse(await handleDispatchRun(message));
-        return;
-      }
-
-      sendResponse({
-        ok: false,
-        error: `Unsupported message type: ${message.type}`
-      });
-    } catch (error) {
-      console.error('[bridge sw] message handler failed:', error);
-      sendResponse({
-        ok: false,
-        error: String(error)
-      });
+async function handleSetAutoDispatch(message) {
+  const current = await readBridgeState();
+  return writeBridgeState({
+    ...current,
+    settings: {
+      ...current.settings,
+      autoDispatch: Boolean(message.enabled)
     }
-  })();
-
-  return true;
-});
-
-chrome.storage.onChanged.addListener((changes, areaName) => {
-  if (areaName !== 'local' || !changes[STORAGE_KEY]) {
-    return;
-  }
-  syncActionState(changes[STORAGE_KEY].newValue || defaultBridgeState()).catch((error) => {
-    console.error('[bridge sw] failed to sync badge state:', error);
   });
-});
+}
+
+function registerRuntimeListeners() {
+  chrome.runtime.onInstalled.addListener(() => {
+    console.log('ChatGPT Codex Bridge for Edge installed.');
+    refreshBridgeState().catch((error) => {
+      console.error('[bridge sw] failed to initialize bridge state:', error);
+    });
+  });
+
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (!message || !message.type) {
+      return false;
+    }
+
+    (async () => {
+      try {
+        if (message.type === 'WEB_CONTEXT_PACKET') {
+          sendResponse(await handleWebContextPacket(message, sender));
+          return;
+        }
+
+        if (message.type === 'GET_BRIDGE_STATE') {
+          sendResponse(await handleGetBridgeState());
+          return;
+        }
+
+        if (message.type === 'REFRESH_BRIDGE_STATE') {
+          sendResponse(await handleRefreshBridgeState(message));
+          return;
+        }
+
+        if (message.type === 'DISPATCH_RUN') {
+          sendResponse(await handleDispatchRun(message));
+          return;
+        }
+
+        if (message.type === 'SET_AUTO_DISPATCH') {
+          sendResponse(await handleSetAutoDispatch(message));
+          return;
+        }
+
+        sendResponse({
+          ok: false,
+          error: `Unsupported message type: ${message.type}`
+        });
+      } catch (error) {
+        console.error('[bridge sw] message handler failed:', error);
+        sendResponse({
+          ok: false,
+          error: String(error)
+        });
+      }
+    })();
+
+    return true;
+  });
+
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName !== 'local' || !changes[STORAGE_KEY]) {
+      return;
+    }
+    syncActionState(normalizeState(changes[STORAGE_KEY].newValue)).catch((error) => {
+      console.error('[bridge sw] failed to sync badge state:', error);
+    });
+  });
+}
+
+if (
+  globalThis.chrome?.runtime?.onInstalled?.addListener &&
+  globalThis.chrome?.runtime?.onMessage?.addListener &&
+  globalThis.chrome?.storage?.onChanged?.addListener
+) {
+  registerRuntimeListeners();
+}

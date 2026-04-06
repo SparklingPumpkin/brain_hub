@@ -4,7 +4,11 @@
   "root_dir": "./workflow_bridge",
   "auto_dispatch": false,
   "default_dispatch_mode": "local_adapter",
-  "codex_adapter_cmd": "node ./adapters/mock-codex-adapter.js",
+  "codex_adapter_cmd": "node ./adapters/real-codex-adapter.js --codex-exec-cmd \"codex exec\" --sandbox workspace-write",
+  "default_project_workdir_root": "./demo_projects",
+  "project_workdirs": {
+    "personal_blog_smoke": "./demo_projects/personal_blog_smoke"
+  },
   "allow_remote_worker": false,
   "approval_policy": "manual_on_risk",
   "log_level": "info",

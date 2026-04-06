@@ -3,7 +3,7 @@
   "name": "ChatGPT Codex Bridge for Edge",
   "version": "0.2.0",
   "description": "Capture a context packet from ChatGPT in Microsoft Edge and send it to a local hub.",
-  "permissions": ["storage"],
+  "permissions": ["storage", "tabs"],
   "host_permissions": [
     "https://chatgpt.com/*",
     "https://chat.openai.com/*",

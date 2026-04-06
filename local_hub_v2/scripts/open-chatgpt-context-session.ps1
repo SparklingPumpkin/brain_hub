@@ -8,6 +8,8 @@ param(
   [Parameter(Mandatory = $true)]
   [string]$Goal,
 
+  # Pass multiple constraints with array syntax, e.g.
+  # -Constraint @("Keep it static", "Use plain HTML and CSS only")
   [string[]]$Constraint = @(),
 
   [switch]$EnsureHubRunning

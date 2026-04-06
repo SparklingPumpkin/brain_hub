@@ -48,7 +48,9 @@ The extension popup now lets you:
 - See the latest captured packet metadata
 - Refresh the latest project state from the Hub
 - Trigger `POST /runs/:projectId/:cycleId/dispatch` for the latest run
+- Toggle auto dispatch for newly captured packets
 - Read the latest execution summary and suggested next step
+- Push the completed Hub result back into the current ChatGPT thread automatically
 
 ## Notes
 

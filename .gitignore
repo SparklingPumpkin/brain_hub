@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+chatgpt-codex-bridge-edge-v1.1/node_modules/
+
+# Local Hub runtime state
+local_hub_v2/.runtime/
+local_hub_v2/workflow_bridge/
+
+# Logs
+*.log
+local_hub_v2/*.log
+chatgpt-codex-bridge-edge-v1.1/*.log
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.vscode/

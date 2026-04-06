@@ -1,3 +1,5 @@
+import fs from "node:fs/promises";
+import path from "node:path";
 import { spawn } from "node:child_process";
 
 function splitCommand(commandLine) {
@@ -19,6 +21,17 @@ export async function runLocalAdapter({
 }) {
   const [command, ...baseArgs] = splitCommand(config.codexAdapterCommand);
   const resolvedCommand = command === "node" ? process.execPath : command;
+  const hasExplicitWorkdir = baseArgs.includes("--workdir");
+  const resolvedWorkdir =
+    config.projectWorkdirs?.[projectId] ??
+    (config.defaultProjectWorkdirRoot
+      ? path.join(config.defaultProjectWorkdirRoot, projectId)
+      : null);
+
+  if (resolvedWorkdir) {
+    await fs.mkdir(resolvedWorkdir, { recursive: true });
+  }
+
   const args = [
     ...baseArgs,
     "--input",
@@ -30,6 +43,10 @@ export async function runLocalAdapter({
     "--cycle",
     cycleId,
   ];
+
+  if (resolvedWorkdir && !hasExplicitWorkdir) {
+    args.push("--workdir", resolvedWorkdir);
+  }
 
   return new Promise((resolve, reject) => {
     const child = spawn(resolvedCommand, args, {

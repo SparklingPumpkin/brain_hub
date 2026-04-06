@@ -52,13 +52,24 @@ npm test
 
 ## 切换到真实 Codex Adapter
 
-默认配置仍然使用 mock adapter，避免影响当前可用闭环。
+当前仓库里的 `hub.config.json` 已默认切到真实 Codex CLI adapter，并且会优先把项目执行目录映射到 `demo_projects/<project_id>`。
 
-如果要切换到真实 Codex CLI，可把 `hub.config.json` 里的 `codex_adapter_cmd` 改成类似下面的形式：
+如果你想手动调整，可把 `hub.config.json` 里的 `codex_adapter_cmd` 改成类似下面的形式：
 
 ```json
 {
   "codex_adapter_cmd": "node ./adapters/real-codex-adapter.js --codex-exec-cmd \"codex exec\" --sandbox workspace-write"
+}
+```
+
+同时可选配置项目工作目录：
+
+```json
+{
+  "default_project_workdir_root": "./demo_projects",
+  "project_workdirs": {
+    "personal_blog_smoke": "./demo_projects/personal_blog_smoke"
+  }
 }
 ```
 
@@ -75,6 +86,7 @@ npm test
 - 调用 `codex exec`
 - 要求 Codex 按 JSON Schema 输出 `execution_report`、`context_pack`、`status`
 - 自动回传到 `POST /packets/codex`
+- 自动把 `project_id` 解析到对应工作目录，再执行真实任务
 
 ## 一键打开 ChatGPT 并准备 context-packet 提示词
 

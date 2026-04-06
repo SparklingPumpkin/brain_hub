@@ -12,7 +12,32 @@ const DEFAULT_CONFIG = {
   approval_policy: "manual_on_risk",
   log_level: "info",
   version: "v2-alpha",
+  default_project_workdir_root: null,
+  project_workdirs: {},
 };
+
+function resolveOptionalPath(projectRoot, value) {
+  if (typeof value !== "string" || value.trim() === "") {
+    return null;
+  }
+
+  return path.resolve(projectRoot, value);
+}
+
+function normalizeProjectWorkdirs(projectRoot, value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return {};
+  }
+
+  return Object.fromEntries(
+    Object.entries(value)
+      .map(([projectId, workdir]) => [
+        String(projectId).trim(),
+        resolveOptionalPath(projectRoot, workdir),
+      ])
+      .filter(([projectId, workdir]) => projectId && workdir)
+  );
+}
 
 export async function loadConfig({
   configPath = path.resolve(process.cwd(), "hub.config.json"),
@@ -46,6 +71,18 @@ export async function loadConfig({
       DEFAULT_CONFIG.approval_policy,
     logLevel: merged.logLevel ?? merged.log_level ?? DEFAULT_CONFIG.log_level,
     version: String(merged.version ?? DEFAULT_CONFIG.version),
+    defaultProjectWorkdirRoot: resolveOptionalPath(
+      projectRoot,
+      merged.defaultProjectWorkdirRoot ??
+        merged.default_project_workdir_root ??
+        DEFAULT_CONFIG.default_project_workdir_root
+    ),
+    projectWorkdirs: normalizeProjectWorkdirs(
+      projectRoot,
+      merged.projectWorkdirs ??
+        merged.project_workdirs ??
+        DEFAULT_CONFIG.project_workdirs
+    ),
   };
   config.hubUrl = `http://${config.host}:${config.port}`;
   return config;

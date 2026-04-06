@@ -385,3 +385,88 @@
 - 用真实 ChatGPT 页面再跑一轮人工观察
 
 这一步属于最终人工验收，而不是功能缺失。
+
+---
+
+## 10. 本轮执行更新（2026-04-06，续）
+
+本轮又继续完成了“真实默认执行 + 自动 dispatch 开关 + Hub 回传 ChatGPT”这三项补强能力。
+
+### 10.1 Hub 默认执行链路已切到真实 adapter
+
+已完成：
+
+- `local_hub_v2/hub.config.json` 默认 `codex_adapter_cmd` 已切到 `real-codex-adapter.js`
+- Hub 新增项目工作目录映射能力：
+  - 支持 `default_project_workdir_root`
+  - 支持 `project_workdirs`
+- `runLocalAdapter` 现在会按 `project_id` 自动补 `--workdir`
+
+这意味着：
+
+- 当前本地启动的 Hub，默认不再走 mock adapter
+- 对于 `personal_blog_smoke` 这类 demo 项目，会直接落到 `demo_projects/personal_blog_smoke`
+- 新项目如果没有单独映射，也会默认解析到 `demo_projects/<project_id>`
+
+### 10.2 扩展已支持 auto dispatch 开关
+
+已完成：
+
+- popup 新增 `Auto Dispatch` 开关
+- 开启后：扩展捕获新的 `context-packet` 后，会立即调用 Hub 的 dispatch
+- 关闭后：仍保持现在的手动 `Dispatch Latest Run` 模式
+- 该状态会保存在扩展本地存储里
+
+这里特意没有直接把 Hub 全局 `auto_dispatch` 改成 `true`，而是把自动分发控制权放在扩展侧，这样更符合实际使用习惯，也更容易逐步验收。
+
+### 10.3 Hub 执行完成后已能回传到 ChatGPT 线程
+
+已完成：
+
+- 扩展后台现在会在 run 进入 `completed / needs_review / blocked` 后读取最新 `context pack`
+- 然后把整理后的 `local-hub-context` 消息自动送回原来的 ChatGPT 标签页
+- 消息内容包含：
+  - project / cycle / status
+  - execution summary
+  - verification
+  - open issues / risks
+  - suggested next step
+  - `web_recovery_prompt`
+- 回传消息明确要求 ChatGPT：
+  - 使用这些内容作为当前线程的最新执行上下文
+  - 可以简短总结
+  - 等待下一步用户指令
+  - 不要在未明确要求时自动输出新的 `context-packet`
+
+这一步已经把“ChatGPT -> 扩展 -> Hub -> Codex -> Hub -> ChatGPT”的闭环真正接上。
+
+### 10.4 真实默认链路已做冒烟验证
+
+已实际验证：
+
+- 重启 Hub 后，已加载新的默认配置
+- 使用 `personal_blog_smoke / cycle 003` 对 Hub 手工发起 strategy packet
+- dispatch 成功走通真实 `codex exec`
+- 最终 run 状态为 `completed`
+- execution packet 里出现真实 `changed_files`
+- 实际修改已写入 `demo_projects/personal_blog_smoke/index.html`
+
+本次真实冒烟的结果说明：
+
+- 当前默认 Hub 配置已经不是 mock
+- 真实 adapter、工作目录映射、结果回传模型都已协同工作
+- 扩展 reload 之后，新的 popup 开关与回传闭环即可直接参与人工联调
+
+### 10.5 当前阶段判断
+
+到这一步为止，可以认为：
+
+- 阶段 A：已完成
+- 阶段 B：已完成，并补齐了自动 dispatch 开关与 ChatGPT 回传闭环
+- 阶段 C：还未系统化完成，仍需要继续补失败分类、超时、审查边界
+
+因此下一阶段主线已进一步收敛为：
+
+1. 完善真实执行下的失败、超时和人工审查机制
+2. 补一轮“扩展真实点击 + ChatGPT 回传可见”的最终人工验收记录
+3. 再决定是否把某些项目默认设成自动 dispatch

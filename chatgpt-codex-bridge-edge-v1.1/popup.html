@@ -63,6 +63,20 @@
       <p id="context-next" class="small">No context pack yet.</p>
     </section>
 
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Automation</h2>
+      </div>
+      <label class="toggle-row" for="auto-dispatch-toggle">
+        <span>
+          <strong id="auto-dispatch-label">Auto Dispatch Off</strong>
+          <small>When enabled, each newly captured packet is dispatched immediately.</small>
+        </span>
+        <input id="auto-dispatch-toggle" type="checkbox">
+      </label>
+      <p id="loopback-status" class="small muted">ChatGPT loopback idle.</p>
+    </section>
+
     <section class="actions">
       <button id="refresh-button" type="button">Refresh</button>
       <button id="dispatch-button" type="button">Dispatch Latest Run</button>

@@ -1,6 +1,7 @@
 const PACKET_LABEL = 'context-packet';
 let lastPacketHash = '';
 let debounceTimer = null;
+let warnedAboutMissingRuntime = false;
 
 function simpleHash(text) {
   let hash = 0;
@@ -66,9 +67,7 @@ function extractPacketFromRenderedText(rawText) {
         continue;
       }
 
-      // Ignore a few common UI strings that may appear around code blocks.
       if (/^copy$/i.test(trimmed)) continue;
-
       break;
     }
 
@@ -119,7 +118,123 @@ function findLatestPacket() {
   return extractPacketFromRawText(wholePageText) || extractPacketFromRenderedText(wholePageText);
 }
 
+function getComposerElement() {
+  const selectors = [
+    '#prompt-textarea',
+    'textarea[data-testid="composer-text-input"]',
+    'textarea',
+    'div[data-testid="composer-text-input"]',
+    'div[contenteditable="true"][data-testid]',
+    'div[contenteditable="true"]'
+  ];
+
+  for (const selector of selectors) {
+    const element = document.querySelector(selector);
+    if (element instanceof HTMLElement) {
+      return element;
+    }
+  }
+
+  return null;
+}
+
+function findSubmitButton() {
+  const selectors = [
+    'button[data-testid="send-button"]',
+    'button[aria-label*="Send"]',
+    'button[aria-label*="发送"]'
+  ];
+
+  for (const selector of selectors) {
+    const element = document.querySelector(selector);
+    if (element instanceof HTMLButtonElement && !element.disabled) {
+      return element;
+    }
+  }
+
+  return null;
+}
+
+function dispatchComposerInput(element) {
+  element.dispatchEvent(new InputEvent('input', {
+    bubbles: true,
+    cancelable: true,
+    inputType: 'insertText',
+    data: null
+  }));
+}
+
+function setTextInputValue(element, text) {
+  const prototype = Object.getPrototypeOf(element);
+  const descriptor = Object.getOwnPropertyDescriptor(prototype, 'value');
+
+  if (descriptor?.set) {
+    descriptor.set.call(element, text);
+  } else {
+    element.value = text;
+  }
+
+  dispatchComposerInput(element);
+  element.dispatchEvent(new Event('change', { bubbles: true }));
+}
+
+function setContentEditableValue(element, text) {
+  element.focus();
+
+  try {
+    document.execCommand('selectAll', false);
+    document.execCommand('insertText', false, text);
+  } catch {
+    element.textContent = text;
+  }
+
+  dispatchComposerInput(element);
+}
+
+async function insertMessageIntoChatGpt(text, autoSubmit = false) {
+  const composer = getComposerElement();
+  if (!composer) {
+    return {
+      ok: false,
+      error: 'ChatGPT composer not found'
+    };
+  }
+
+  composer.focus();
+
+  if (composer instanceof HTMLTextAreaElement || composer instanceof HTMLInputElement) {
+    setTextInputValue(composer, text);
+  } else {
+    setContentEditableValue(composer, text);
+  }
+
+  if (autoSubmit) {
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    const submitButton = findSubmitButton();
+    if (!submitButton) {
+      return {
+        ok: false,
+        error: 'ChatGPT submit button not found'
+      };
+    }
+    submitButton.click();
+  }
+
+  return { ok: true };
+}
+
 async function sendPacket(packetText) {
+  if (!globalThis.chrome?.runtime?.sendMessage) {
+    if (!warnedAboutMissingRuntime) {
+      warnedAboutMissingRuntime = true;
+      console.warn(
+        'ChatGPT Codex Bridge: extension runtime is unavailable. ' +
+        'If you just reloaded the extension, refresh this ChatGPT tab and ask for the context-packet again.'
+      );
+    }
+    return;
+  }
+
   try {
     const response = await chrome.runtime.sendMessage({
       type: 'WEB_CONTEXT_PACKET',
@@ -133,6 +248,18 @@ async function sendPacket(packetText) {
     });
     console.log('Packet sent to extension background:', response);
   } catch (error) {
+    const message = String(error);
+    if (
+      message.includes('Extension context invalidated') ||
+      message.includes('Receiving end does not exist')
+    ) {
+      console.warn(
+        'ChatGPT Codex Bridge: extension context was invalidated. ' +
+        'Refresh this ChatGPT tab after reloading the extension, then ask ChatGPT to emit the context-packet again.'
+      );
+      return;
+    }
+
     console.error('Failed to send packet to extension background:', error);
   }
 }
@@ -152,6 +279,28 @@ function scheduleCapture() {
   clearTimeout(debounceTimer);
   debounceTimer = setTimeout(tryCapturePacket, 900);
 }
+
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message?.type !== 'INSERT_CHATGPT_MESSAGE') {
+    return false;
+  }
+
+  insertMessageIntoChatGpt(
+    message.payload?.text || '',
+    Boolean(message.payload?.autoSubmit)
+  )
+    .then((result) => {
+      sendResponse(result);
+    })
+    .catch((error) => {
+      sendResponse({
+        ok: false,
+        error: String(error)
+      });
+    });
+
+  return true;
+});
 
 const observer = new MutationObserver(() => {
   scheduleCapture();

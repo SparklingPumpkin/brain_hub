@@ -11,6 +11,9 @@ const runCycle = document.getElementById('run-cycle');
 const runUpdated = document.getElementById('run-updated');
 const executionSummary = document.getElementById('execution-summary');
 const contextNext = document.getElementById('context-next');
+const autoDispatchToggle = document.getElementById('auto-dispatch-toggle');
+const autoDispatchLabel = document.getElementById('auto-dispatch-label');
+const loopbackStatus = document.getElementById('loopback-status');
 const statusLine = document.getElementById('status-line');
 const refreshButton = document.getElementById('refresh-button');
 const dispatchButton = document.getElementById('dispatch-button');
@@ -97,6 +100,19 @@ function renderState(state) {
     contextPack?.suggested_next_step ||
     'No context pack yet.';
 
+  const autoDispatch = Boolean(state?.settings?.autoDispatch);
+  autoDispatchToggle.checked = autoDispatch;
+  autoDispatchLabel.textContent = autoDispatch ? 'Auto Dispatch On' : 'Auto Dispatch Off';
+
+  const loopback = state?.loopback || {};
+  if (loopback.status === 'delivered') {
+    loopbackStatus.textContent = `Latest result returned to ChatGPT at ${formatTime(loopback.deliveredAt)}.`;
+  } else if (loopback.status === 'failed') {
+    loopbackStatus.textContent = `ChatGPT loopback failed: ${loopback.error || 'unknown error'}`;
+  } else {
+    loopbackStatus.textContent = 'ChatGPT loopback idle.';
+  }
+
   dispatchButton.disabled = !packet.projectId || !packet.cycleId || !hub.ok;
 
   if (projectState && (projectState.current_status === 'pending' || projectState.current_status === 'running' || projectState.current_status === 'dispatched')) {
@@ -157,12 +173,35 @@ async function dispatchLatestRun() {
   }
 }
 
+async function setAutoDispatch(enabled) {
+  try {
+    statusLine.textContent = enabled
+      ? 'Enabling auto dispatch...'
+      : 'Disabling auto dispatch...';
+    const state = await request({
+      type: 'SET_AUTO_DISPATCH',
+      enabled
+    });
+    renderState(state);
+    statusLine.textContent = enabled
+      ? 'Auto dispatch enabled.'
+      : 'Auto dispatch disabled.';
+  } catch (error) {
+    autoDispatchToggle.checked = !enabled;
+    statusLine.textContent = `Failed to update auto dispatch: ${String(error)}`;
+  }
+}
+
 refreshButton.addEventListener('click', () => {
   refreshState(true);
 });
 
 dispatchButton.addEventListener('click', () => {
   dispatchLatestRun();
+});
+
+autoDispatchToggle.addEventListener('change', () => {
+  setAutoDispatch(autoDispatchToggle.checked);
 });
 
 document.addEventListener('visibilitychange', () => {
