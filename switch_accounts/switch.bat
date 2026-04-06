@@ -1,4 +1,5 @@
 @echo off
+setlocal enabledelayedexpansion
 chcp 65001 >nul
 title OpenAI 账号一键切换工具
 color 0A
@@ -22,55 +23,40 @@ if not exist "%ACCOUNT_BASE%" (
 echo 可用账号列表：
 echo.
 
-set "idx=0"
-set "account_list="
+:: 扫描账号
+set idx=0
 for /d %%D in ("%ACCOUNT_BASE%\*") do (
     set /a idx+=1
-    call echo  %%idx%%：%%%%~nxD
-    set "account_list=%%account_list%% %%idx%%:%%~nxD"
+    set "name=%%~nxD"
+    echo !idx!: !name!
+    set "account_!idx!=!name!"
 )
 
 echo.
-if %idx% equ 0 (
-    echo 未找到任何账号文件夹
-    pause >nul
-    exit
-)
+set /p "choice=请输入序号："
 
-set /p "choice=请输入序号切换账号："
-
-set "target_account="
-for %%i in (%account_list%) do (
-    for /f "tokens=1,2 delims=:" %%a in ("%%i") do (
-        if %%a equ %choice% set "target_account=%%b"
-    )
-)
-
+:: 获取选中账号
+set "target_account=!account_%choice%!"
 if not defined target_account (
     echo 无效选择！
     pause >nul
     exit
 )
 
-set "SRC_FILE=%ACCOUNT_BASE%\%target_account%\auth.json"
+set "SRC_FILE=%ACCOUNT_BASE%\!target_account!\auth.json"
+echo.
+echo 正在切换 → !target_account!
+
+:: 复制到本地（正确路径：.codex）
+copy /y "!SRC_FILE!" "%USERPROFILE%\.codex\auth.json" >nul
+echo ✅ 本地覆盖完成
+
+:: ========================
+:: 【和你手动命令完全一样】
+:: ========================
+echo 正在上传到服务器...
+scp "%USERPROFILE%\.codex\auth.json" cv4x4090:~/.codex/auth.json
 
 echo.
-echo 正在切换 → %target_account%
-echo ==================================================
-
-if not exist "%SRC_FILE%" (
-    echo 错误：未找到 auth.json
-    pause >nul
-    exit
-)
-
-copy /y "%SRC_FILE%" "%DEST_FILE%" >nul
-echo ✅ 已覆盖本地配置
-
-echo 正在上传到远程服务器...
-scp "%DEST_FILE%" "%REMOTE_PATH%"
-
-echo.
-echo ✅ 切换完成！
-echo.
+echo ✅ 账号切换 + 上传成功！
 pause >nul
