@@ -1,0 +1,4 @@
+{"timestamp":"2026-04-06T07:46:20.549Z","event":"strategy_received","project_id":"personal_blog_smoke","cycle_id":"010","run_id":"run_personal_blog_smoke_010","status":"pending","packet_id":"pkt_20260406_8c8cc84f"}
+{"timestamp":"2026-04-06T07:46:20.561Z","event":"run_dispatched","project_id":"personal_blog_smoke","cycle_id":"010","run_id":"run_personal_blog_smoke_010","status":"dispatched"}
+{"timestamp":"2026-04-06T07:46:20.568Z","event":"run_running","project_id":"personal_blog_smoke","cycle_id":"010","run_id":"run_personal_blog_smoke_010","status":"running"}
+{"timestamp":"2026-04-06T07:52:10.735Z","event":"dispatch_failed","project_id":"personal_blog_smoke","cycle_id":"010","run_id":"run_personal_blog_smoke_010","status":"needs_review","error":"Local adapter exited with code 1: fetch failed"}

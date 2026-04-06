@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maple Notes</title>
+  <meta name="theme-color" content="#f4ede3">
+  <meta
+    name="description"
+    content="Maple Notes is a warm, personal blog homepage sharing small stories, routines, and reflections."
+  >
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div class="page-shell">
+    <header class="hero">
+      <nav class="topbar" aria-label="Primary">
+        <a class="brand" href="#top">Maple Notes</a>
+        <div class="nav-links">
+          <a href="#about">About</a>
+          <a href="#posts">Recent Posts</a>
+          <a href="#contact">Contact</a>
+        </div>
+      </nav>
+
+      <section class="hero-content" id="top" aria-labelledby="hero-title">
+        <div class="hero-grid">
+          <div class="hero-copy-block">
+            <p class="eyebrow">Letters from a quieter corner of the internet</p>
+            <h1 id="hero-title">Stories about slow mornings, city walks, and making room for good things.</h1>
+            <p class="hero-copy">
+              Maple Notes is a static personal blog collecting design, engineering, and AI notes
+              in one calm place for sketches, experiments, and practical reflections.
+            </p>
+            <div class="hero-actions">
+              <a class="button button-primary" href="#posts">Read the latest</a>
+              <a class="button button-secondary" href="#about">Meet Lena</a>
+            </div>
+          </div>
+
+          <aside class="hero-panel" aria-label="Weekly note">
+            <p class="section-label">This Week</p>
+            <h2>Small things worth keeping.</h2>
+            <ul class="hero-notes">
+              <li><strong>Notebook:</strong> station sketches and cafe overheard lines.</li>
+              <li><strong>Kitchen:</strong> a lemon cake recipe with less sugar and more zest.</li>
+              <li><strong>Walks:</strong> evening routes chosen by whichever street has the best trees.</li>
+            </ul>
+            <p class="hero-panel-signoff">Updated every Sunday with one new note from Lena's week.</p>
+          </aside>
+        </div>
+      </section>
+    </header>
+
+    <main id="main-content" tabindex="-1">
+      <section class="about section-card" id="about" aria-labelledby="about-title">
+        <div class="section-heading">
+          <p class="section-label">About</p>
+          <h2 id="about-title">A personal blog shaped by warmth, curiosity, and everyday craft.</h2>
+        </div>
+        <div class="about-grid">
+          <p>
+            Lena writes from a sunlit apartment above a corner bakery, collecting observations
+            from train rides, sketchbooks, recipe cards, and neighborhood conversations.
+          </p>
+          <p>
+            Her blog is part diary, part notebook: a place to share reflections on creative
+            routines, thoughtful travel, and how to build a life that feels both grounded and open.
+          </p>
+        </div>
+      </section>
+
+      <section class="note-band section-card" aria-labelledby="motto-title">
+        <p class="section-label">Notebook Motto</p>
+        <p class="note-band-copy" id="motto-title">
+          Keep what feels useful, write what feels true, and leave enough empty space for the next idea.
+        </p>
+      </section>
+
+      <section class="posts section-card" id="posts" aria-labelledby="posts-title">
+        <div class="section-heading">
+          <p class="section-label">Recent Posts</p>
+          <h2 id="posts-title">Three recent entries from the notebook.</h2>
+        </div>
+
+        <div class="post-grid" role="list">
+          <article class="post-card" role="listitem">
+            <p class="post-meta">March 28, 2026 · Rituals</p>
+            <h3>The Saturday Breakfast That Resets My Whole Week</h3>
+            <p>
+              A simple morning routine built around soft music, fresh fruit, and a page of
+              handwritten plans before the day becomes loud.
+            </p>
+            <a class="post-link" href="#contact" aria-label="Keep reading The Saturday Breakfast That Resets My Whole Week">Keep reading</a>
+          </article>
+
+          <article class="post-card" role="listitem">
+            <p class="post-meta">March 19, 2026 · Creativity</p>
+            <h3>What I Learned From Carrying One Sketchbook Everywhere</h3>
+            <p>
+              Fewer tools, better attention. Notes on drawing in cafes, on sidewalks, and while
+              waiting for ordinary moments to become memorable.
+            </p>
+            <a class="post-link" href="#contact" aria-label="Keep reading What I Learned From Carrying One Sketchbook Everywhere">Keep reading</a>
+          </article>
+
+          <article class="post-card" role="listitem">
+            <p class="post-meta">March 7, 2026 · City Life</p>
+            <h3>An Evening Walk Guide for When Your Brain Feels Too Busy</h3>
+            <p>
+              A gentle route, three prompts, and the case for leaving your phone in your pocket
+              long enough to hear your own thoughts again.
+            </p>
+            <a class="post-link" href="#contact" aria-label="Keep reading An Evening Walk Guide for When Your Brain Feels Too Busy">Keep reading</a>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer section-card" id="contact" aria-labelledby="contact-title">
+      <div>
+        <p class="section-label">Contact</p>
+        <h2 id="contact-title">Say hello or swap favorite recommendations.</h2>
+      </div>
+      <div class="footer-copy">
+        <p>
+          Reach Lena at <a href="mailto:hello@maplenotes.example">hello@maplenotes.example</a>
+          or follow along on <a href="#">Journal Club</a>.
+        </p>
+        <p class="footer-note">Made as a static homepage demo with plain HTML and CSS.</p>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

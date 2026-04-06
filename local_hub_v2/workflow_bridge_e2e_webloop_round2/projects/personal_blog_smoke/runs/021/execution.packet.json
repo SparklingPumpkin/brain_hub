@@ -1,0 +1,32 @@
+{
+  "packet_id": "pkt_20260406_9fd19cbe",
+  "packet_version": "v1",
+  "packet_type": "execution",
+  "project_id": "personal_blog_smoke",
+  "cycle_id": "021",
+  "stage": "execution",
+  "source": "codex-real-adapter",
+  "parent_packet_id": "pkt_20260406_aed9949f",
+  "created_at": "2026-04-06T08:07:30.921Z",
+  "status": "completed",
+  "raw_text": "{\n  \"changed_files\": [\n    \"index.html\",\n    \"styles.css\"\n  ],\n  \"summary\": [\n    \"Added `tabindex=\\\"-1\\\"` to the existing `#main-content` element so the skip link can move keyboard focus to the main region.\",\n    \"Added a visible focus outline for the `main` target to make skip-link landing state clear without changing layout or copy.\"\n  ],\n  \"verification\": [\n    \"`rg -n \\\"skip-link|main-content|main:focus-visible|<main\\\" index.html styles.css`\",\n    \"`Get-Content -Path index.html | Select-String -Pattern '<main id=\\\"main-content\\\" tabindex=\\\"-1\\\">' -Context 0,0`\",\n    \"`Get-Content -Path styles.css | Select-String -Pattern '^main:focus-visible \\\\{$' -Context 0,3`\"\n  ],\n  \"open_issues\": [],\n  \"risks\": [],\n  \"next_step\": \"Browser-side reviewer can confirm keyboard behavior: first Tab reaches the skip link, and activating it visibly focuses the main content.\"\n}",
+  "parsed": {
+    "changed_files": [
+      "index.html",
+      "styles.css"
+    ],
+    "summary": [
+      "Added `tabindex=\"-1\"` to the existing `#main-content` element so the skip link can move keyboard focus to the main region.",
+      "Added a visible focus outline for the `main` target to make skip-link landing state clear without changing layout or copy."
+    ],
+    "verification": [
+      "`rg -n \"skip-link|main-content|main:focus-visible|<main\" index.html styles.css`",
+      "`Get-Content -Path index.html | Select-String -Pattern '<main id=\"main-content\" tabindex=\"-1\">' -Context 0,0`",
+      "`Get-Content -Path styles.css | Select-String -Pattern '^main:focus-visible \\{$' -Context 0,3`"
+    ],
+    "open_issues": [],
+    "risks": [],
+    "next_step": "Browser-side reviewer can confirm keyboard behavior: first Tab reaches the skip link, and activating it visibly focuses the main content."
+  },
+  "meta": {}
+}

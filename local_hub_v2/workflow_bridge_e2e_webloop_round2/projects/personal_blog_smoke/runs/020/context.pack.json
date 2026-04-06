@@ -1,0 +1,37 @@
+{
+  "packet_id": "pkt_20260406_d1d12ba4",
+  "packet_version": "v1",
+  "packet_type": "context",
+  "project_id": "personal_blog_smoke",
+  "cycle_id": "020",
+  "stage": "context",
+  "source": "codex-real-adapter",
+  "parent_packet_id": "pkt_20260406_872b0860",
+  "created_at": "2026-04-06T08:00:49.683Z",
+  "status": "completed",
+  "raw_text": "{\n  \"current_goal\": \"Complete one focused beautification and lightweight optimization pass for the static personal blog homepage while preserving content and structure.\",\n  \"completed\": [\n    \"Inspected the existing `index.html` and `styles.css` structure.\",\n    \"Updated the HTML with accessibility-focused labels and more descriptive repeated links.\",\n    \"Reworked the CSS toward a lighter, less visually heavy presentation with improved mobile readability.\",\n    \"Ran basic markup and stylesheet verification checks.\"\n  ],\n  \"key_files\": [\n    \"index.html\",\n    \"styles.css\"\n  ],\n  \"latest_verification\": [\n    \"`git diff -- index.html styles.css` reviewed cleanly.\",\n    \"HTML parser check returned `html_parse_ok`.\",\n    \"ID presence check returned `missing_ids=none`.\",\n    \"CSS rule presence check returned `css_checks=ok`.\"\n  ],\n  \"open_questions\": [],\n  \"risks\": [],\n  \"suggested_next_step\": \"Perform a browser render check at desktop and mobile widths, then decide whether to stop here or do one smaller polish pass.\",\n  \"web_recovery_prompt\": \"Open `index.html` in a browser and review the page at roughly 1280px and 390px widths. Check that the hero feels lighter than before, cards remain readable, nav links and buttons are easy to tap on mobile, focus states are visible, and the preserved section structure/content still reads naturally. If anything looks off, report the specific spacing, contrast, or wrapping issue and continue with a minimal CSS-only adjustment.\"\n}",
+  "parsed": {
+    "current_goal": "Complete one focused beautification and lightweight optimization pass for the static personal blog homepage while preserving content and structure.",
+    "completed": [
+      "Inspected the existing `index.html` and `styles.css` structure.",
+      "Updated the HTML with accessibility-focused labels and more descriptive repeated links.",
+      "Reworked the CSS toward a lighter, less visually heavy presentation with improved mobile readability.",
+      "Ran basic markup and stylesheet verification checks."
+    ],
+    "key_files": [
+      "index.html",
+      "styles.css"
+    ],
+    "latest_verification": [
+      "`git diff -- index.html styles.css` reviewed cleanly.",
+      "HTML parser check returned `html_parse_ok`.",
+      "ID presence check returned `missing_ids=none`.",
+      "CSS rule presence check returned `css_checks=ok`."
+    ],
+    "open_questions": [],
+    "risks": [],
+    "suggested_next_step": "Perform a browser render check at desktop and mobile widths, then decide whether to stop here or do one smaller polish pass.",
+    "web_recovery_prompt": "Open `index.html` in a browser and review the page at roughly 1280px and 390px widths. Check that the hero feels lighter than before, cards remain readable, nav links and buttons are easy to tap on mobile, focus states are visible, and the preserved section structure/content still reads naturally. If anything looks off, report the specific spacing, contrast, or wrapping issue and continue with a minimal CSS-only adjustment."
+  },
+  "meta": {}
+}

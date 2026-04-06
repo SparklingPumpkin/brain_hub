@@ -1,0 +1,121 @@
+{
+  "startedAt": "2026-04-06T08:04:01.094Z",
+  "submit": {
+    "status": 200,
+    "ok": true,
+    "data": {
+      "ok": true,
+      "packet_id": "pkt_20260406_aed9949f",
+      "run_id": "run_personal_blog_smoke_021",
+      "status": "pending"
+    }
+  },
+  "dispatch": {
+    "status": 200,
+    "ok": true,
+    "data": {
+      "ok": true,
+      "run_id": "run_personal_blog_smoke_021",
+      "status": "completed",
+      "attempt_count": 1
+    }
+  },
+  "state": {
+    "status": 200,
+    "ok": true,
+    "data": {
+      "ok": true,
+      "state": {
+        "project_id": "personal_blog_smoke",
+        "active_cycle_id": "021",
+        "latest_strategy_packet_id": "pkt_20260406_aed9949f",
+        "latest_execution_packet_id": "pkt_20260406_9fd19cbe",
+        "latest_context_pack_id": "pkt_20260406_6edc715f",
+        "current_status": "completed",
+        "last_updated_at": "2026-04-06T08:07:31.001Z"
+      }
+    }
+  },
+  "latestExecution": {
+    "status": 200,
+    "ok": true,
+    "data": {
+      "ok": true,
+      "packet": {
+        "packet_id": "pkt_20260406_9fd19cbe",
+        "packet_version": "v1",
+        "packet_type": "execution",
+        "project_id": "personal_blog_smoke",
+        "cycle_id": "021",
+        "stage": "execution",
+        "source": "codex-real-adapter",
+        "parent_packet_id": "pkt_20260406_aed9949f",
+        "created_at": "2026-04-06T08:07:30.921Z",
+        "status": "completed",
+        "raw_text": "{\n  \"changed_files\": [\n    \"index.html\",\n    \"styles.css\"\n  ],\n  \"summary\": [\n    \"Added `tabindex=\\\"-1\\\"` to the existing `#main-content` element so the skip link can move keyboard focus to the main region.\",\n    \"Added a visible focus outline for the `main` target to make skip-link landing state clear without changing layout or copy.\"\n  ],\n  \"verification\": [\n    \"`rg -n \\\"skip-link|main-content|main:focus-visible|<main\\\" index.html styles.css`\",\n    \"`Get-Content -Path index.html | Select-String -Pattern '<main id=\\\"main-content\\\" tabindex=\\\"-1\\\">' -Context 0,0`\",\n    \"`Get-Content -Path styles.css | Select-String -Pattern '^main:focus-visible \\\\{$' -Context 0,3`\"\n  ],\n  \"open_issues\": [],\n  \"risks\": [],\n  \"next_step\": \"Browser-side reviewer can confirm keyboard behavior: first Tab reaches the skip link, and activating it visibly focuses the main content.\"\n}",
+        "parsed": {
+          "changed_files": [
+            "index.html",
+            "styles.css"
+          ],
+          "summary": [
+            "Added `tabindex=\"-1\"` to the existing `#main-content` element so the skip link can move keyboard focus to the main region.",
+            "Added a visible focus outline for the `main` target to make skip-link landing state clear without changing layout or copy."
+          ],
+          "verification": [
+            "`rg -n \"skip-link|main-content|main:focus-visible|<main\" index.html styles.css`",
+            "`Get-Content -Path index.html | Select-String -Pattern '<main id=\"main-content\" tabindex=\"-1\">' -Context 0,0`",
+            "`Get-Content -Path styles.css | Select-String -Pattern '^main:focus-visible \\{$' -Context 0,3`"
+          ],
+          "open_issues": [],
+          "risks": [],
+          "next_step": "Browser-side reviewer can confirm keyboard behavior: first Tab reaches the skip link, and activating it visibly focuses the main content."
+        },
+        "meta": {}
+      }
+    }
+  },
+  "latestContext": {
+    "status": 200,
+    "ok": true,
+    "data": {
+      "ok": true,
+      "packet": {
+        "packet_id": "pkt_20260406_6edc715f",
+        "packet_version": "v1",
+        "packet_type": "context",
+        "project_id": "personal_blog_smoke",
+        "cycle_id": "021",
+        "stage": "context",
+        "source": "codex-real-adapter",
+        "parent_packet_id": "pkt_20260406_9fd19cbe",
+        "created_at": "2026-04-06T08:07:30.921Z",
+        "status": "completed",
+        "raw_text": "{\n  \"current_goal\": \"Refine the static page's skip-to-content keyboard navigation with minimal accessibility-only changes.\",\n  \"completed\": [\n    \"Confirmed the page already had a skip link as the first focusable element.\",\n    \"Made the main content target programmatically focusable for reliable skip-link behavior.\",\n    \"Added concise CSS so the focused main region is visibly indicated after skipping.\"\n  ],\n  \"key_files\": [\n    \"index.html\",\n    \"styles.css\"\n  ],\n  \"latest_verification\": [\n    \"`index.html` contains `<main id=\\\"main-content\\\" tabindex=\\\"-1\\\">`.\",\n    \"`styles.css` contains `main:focus-visible` outline styling.\",\n    \"Existing skip-link markup remains in place as the first focusable element in `body`.\"\n  ],\n  \"open_questions\": [],\n  \"risks\": [],\n  \"suggested_next_step\": \"Run a quick browser keyboard pass to confirm the skip link reveals on focus and jumps to the main content as expected.\",\n  \"web_recovery_prompt\": \"Open the updated static page and verify keyboard navigation. Check that the first Tab focuses the existing \\\"Skip to content\\\" link, pressing Enter moves focus to `#main-content`, a visible outline appears on the main region, and no visual/layout regressions were introduced.\"\n}",
+        "parsed": {
+          "current_goal": "Refine the static page's skip-to-content keyboard navigation with minimal accessibility-only changes.",
+          "completed": [
+            "Confirmed the page already had a skip link as the first focusable element.",
+            "Made the main content target programmatically focusable for reliable skip-link behavior.",
+            "Added concise CSS so the focused main region is visibly indicated after skipping."
+          ],
+          "key_files": [
+            "index.html",
+            "styles.css"
+          ],
+          "latest_verification": [
+            "`index.html` contains `<main id=\"main-content\" tabindex=\"-1\">`.",
+            "`styles.css` contains `main:focus-visible` outline styling.",
+            "Existing skip-link markup remains in place as the first focusable element in `body`."
+          ],
+          "open_questions": [],
+          "risks": [],
+          "suggested_next_step": "Run a quick browser keyboard pass to confirm the skip link reveals on focus and jumps to the main content as expected.",
+          "web_recovery_prompt": "Open the updated static page and verify keyboard navigation. Check that the first Tab focuses the existing \"Skip to content\" link, pressing Enter moves focus to `#main-content`, a visible outline appears on the main region, and no visual/layout regressions were introduced."
+        },
+        "meta": {}
+      }
+    }
+  },
+  "finishedAt": "2026-04-06T08:07:31.022Z"
+}

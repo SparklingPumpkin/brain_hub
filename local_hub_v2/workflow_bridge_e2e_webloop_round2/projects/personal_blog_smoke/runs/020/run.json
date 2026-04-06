@@ -1,0 +1,15 @@
+{
+  "run_id": "run_personal_blog_smoke_020",
+  "project_id": "personal_blog_smoke",
+  "cycle_id": "020",
+  "status": "completed",
+  "strategy_packet_id": "pkt_20260406_bd81a7ff",
+  "execution_packet_id": "pkt_20260406_872b0860",
+  "context_pack_id": "pkt_20260406_d1d12ba4",
+  "dispatch_mode": "local_adapter",
+  "assigned_worker": null,
+  "attempt_count": 1,
+  "created_at": "2026-04-06T07:54:51.804Z",
+  "updated_at": "2026-04-06T08:00:49.688Z",
+  "last_error": null
+}

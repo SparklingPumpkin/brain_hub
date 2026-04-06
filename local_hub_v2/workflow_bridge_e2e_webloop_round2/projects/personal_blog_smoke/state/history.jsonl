@@ -1,0 +1,8 @@
+{"timestamp":"2026-04-06T07:54:51.812Z","event":"strategy_received","project_id":"personal_blog_smoke","cycle_id":"020","run_id":"run_personal_blog_smoke_020","status":"pending","packet_id":"pkt_20260406_bd81a7ff"}
+{"timestamp":"2026-04-06T07:54:51.818Z","event":"run_dispatched","project_id":"personal_blog_smoke","cycle_id":"020","run_id":"run_personal_blog_smoke_020","status":"dispatched"}
+{"timestamp":"2026-04-06T07:54:51.823Z","event":"run_running","project_id":"personal_blog_smoke","cycle_id":"020","run_id":"run_personal_blog_smoke_020","status":"running"}
+{"timestamp":"2026-04-06T08:00:49.691Z","event":"codex_result_received","project_id":"personal_blog_smoke","cycle_id":"020","run_id":"run_personal_blog_smoke_020","status":"completed","execution_packet_id":"pkt_20260406_872b0860","context_pack_id":"pkt_20260406_d1d12ba4"}
+{"timestamp":"2026-04-06T08:04:01.129Z","event":"strategy_received","project_id":"personal_blog_smoke","cycle_id":"021","run_id":"run_personal_blog_smoke_021","status":"pending","packet_id":"pkt_20260406_aed9949f"}
+{"timestamp":"2026-04-06T08:04:01.136Z","event":"run_dispatched","project_id":"personal_blog_smoke","cycle_id":"021","run_id":"run_personal_blog_smoke_021","status":"dispatched"}
+{"timestamp":"2026-04-06T08:04:01.142Z","event":"run_running","project_id":"personal_blog_smoke","cycle_id":"021","run_id":"run_personal_blog_smoke_021","status":"running"}
+{"timestamp":"2026-04-06T08:07:31.004Z","event":"codex_result_received","project_id":"personal_blog_smoke","cycle_id":"021","run_id":"run_personal_blog_smoke_021","status":"completed","execution_packet_id":"pkt_20260406_9fd19cbe","context_pack_id":"pkt_20260406_6edc715f"}

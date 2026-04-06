@@ -1,0 +1,36 @@
+{
+  "packet_id": "pkt_20260406_872b0860",
+  "packet_version": "v1",
+  "packet_type": "execution",
+  "project_id": "personal_blog_smoke",
+  "cycle_id": "020",
+  "stage": "execution",
+  "source": "codex-real-adapter",
+  "parent_packet_id": "pkt_20260406_bd81a7ff",
+  "created_at": "2026-04-06T08:00:49.683Z",
+  "status": "completed",
+  "raw_text": "{\n  \"changed_files\": [\n    \"index.html\",\n    \"styles.css\"\n  ],\n  \"summary\": [\n    \"Lightened the homepage visual treatment by simplifying backgrounds, softening shadows, and keeping the existing hero, about, motto, posts, and contact sections intact.\",\n    \"Improved responsive readability with tighter spacing rules, cleaner card styling, better small-screen navigation behavior, and full-width mobile buttons.\",\n    \"Added lightweight accessibility improvements in the HTML, including section heading associations, a theme color meta tag, and descriptive aria-labels for repeated post links.\"\n  ],\n  \"verification\": [\n    \"Ran `git diff -- index.html styles.css` to inspect the final patch.\",\n    \"Ran `python -c \\\"from html.parser import HTMLParser ...\\\"` against `index.html` and confirmed `html_parse_ok`.\",\n    \"Ran a Python check to confirm `hero-title`, `about-title`, `motto-title`, `posts-title`, and `contact-title` IDs exist: `missing_ids=none`.\",\n    \"Ran a CSS presence check for reduced-motion/mobile/focus-related rules and got `css_checks=ok`.\"\n  ],\n  \"open_issues\": [\n    \"Browser-side visual QA was not performed in this CLI environment.\"\n  ],\n  \"risks\": [],\n  \"next_step\": \"Open the static page in a browser and do a quick desktop/mobile pass to confirm spacing, contrast, and tap targets feel right.\"\n}",
+  "parsed": {
+    "changed_files": [
+      "index.html",
+      "styles.css"
+    ],
+    "summary": [
+      "Lightened the homepage visual treatment by simplifying backgrounds, softening shadows, and keeping the existing hero, about, motto, posts, and contact sections intact.",
+      "Improved responsive readability with tighter spacing rules, cleaner card styling, better small-screen navigation behavior, and full-width mobile buttons.",
+      "Added lightweight accessibility improvements in the HTML, including section heading associations, a theme color meta tag, and descriptive aria-labels for repeated post links."
+    ],
+    "verification": [
+      "Ran `git diff -- index.html styles.css` to inspect the final patch.",
+      "Ran `python -c \"from html.parser import HTMLParser ...\"` against `index.html` and confirmed `html_parse_ok`.",
+      "Ran a Python check to confirm `hero-title`, `about-title`, `motto-title`, `posts-title`, and `contact-title` IDs exist: `missing_ids=none`.",
+      "Ran a CSS presence check for reduced-motion/mobile/focus-related rules and got `css_checks=ok`."
+    ],
+    "open_issues": [
+      "Browser-side visual QA was not performed in this CLI environment."
+    ],
+    "risks": [],
+    "next_step": "Open the static page in a browser and do a quick desktop/mobile pass to confirm spacing, contrast, and tap targets feel right."
+  },
+  "meta": {}
+}

@@ -1,0 +1,30 @@
+{
+  "packet_id": "pkt_20260406_aed9949f",
+  "packet_version": "v1",
+  "packet_type": "strategy",
+  "project_id": "personal_blog_smoke",
+  "cycle_id": "021",
+  "stage": "strategy",
+  "source": "web",
+  "parent_packet_id": null,
+  "created_at": "2026-04-06T08:04:01.118Z",
+  "status": "pending",
+  "raw_text": "project_id: personal_blog_smoke\ncycle_id: 021\nstage: strategy\ngoal: Based on web-side review suggestions, add or refine a skip-to-content keyboard navigation pattern and keep the page lightweight without broad visual rewrites.\nconstraints:\n  - Keep changes minimal and focused on accessibility\n  - First focusable element should allow skipping to main content\n  - Keep HTML/CSS static and concise\n  - Preserve current layout and copy\nnext_action: codex_execute",
+  "parsed": {
+    "project_id": "personal_blog_smoke",
+    "cycle_id": "021",
+    "stage": "strategy",
+    "goal": "Based on web-side review suggestions, add or refine a skip-to-content keyboard navigation pattern and keep the page lightweight without broad visual rewrites.",
+    "constraints": [
+      "Keep changes minimal and focused on accessibility",
+      "First focusable element should allow skipping to main content",
+      "Keep HTML/CSS static and concise",
+      "Preserve current layout and copy"
+    ],
+    "next_action": "codex_execute"
+  },
+  "meta": {
+    "source_stage": "web-reply-normalized",
+    "note": "normalized from web context-packet for hub schema"
+  }
+}

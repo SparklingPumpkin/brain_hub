@@ -1,0 +1,29 @@
+{
+  "packet_id": "pkt_20260406_bd81a7ff",
+  "packet_version": "v1",
+  "packet_type": "strategy",
+  "project_id": "personal_blog_smoke",
+  "cycle_id": "020",
+  "stage": "strategy",
+  "source": "web",
+  "parent_packet_id": null,
+  "created_at": "2026-04-06T07:54:51.803Z",
+  "status": "pending",
+  "raw_text": "project_id: personal_blog_smoke\ncycle_id: 020\nstage: strategy\ngoal: Do one focused round of webpage beautification and lightweight optimization for this static blog homepage.\nconstraints:\n  - Keep the page static HTML and CSS\n  - Keep CSS concise and reduce unnecessary visual weight\n  - Preserve existing content and section structure\n  - Improve mobile readability and accessibility\nnext_action: codex_execute",
+  "parsed": {
+    "project_id": "personal_blog_smoke",
+    "cycle_id": "020",
+    "stage": "strategy",
+    "goal": "Do one focused round of webpage beautification and lightweight optimization for this static blog homepage.",
+    "constraints": [
+      "Keep the page static HTML and CSS",
+      "Keep CSS concise and reduce unnecessary visual weight",
+      "Preserve existing content and section structure",
+      "Improve mobile readability and accessibility"
+    ],
+    "next_action": "codex_execute"
+  },
+  "meta": {
+    "source_stage": "manual-test-cycle1"
+  }
+}

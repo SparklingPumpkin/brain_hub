@@ -1,0 +1,29 @@
+{
+  "packet_id": "pkt_20260406_8c8cc84f",
+  "packet_version": "v1",
+  "packet_type": "strategy",
+  "project_id": "personal_blog_smoke",
+  "cycle_id": "010",
+  "stage": "strategy",
+  "source": "web",
+  "parent_packet_id": null,
+  "created_at": "2026-04-06T07:46:20.539Z",
+  "status": "pending",
+  "raw_text": "project_id: personal_blog_smoke\ncycle_id: 010\nstage: strategy\ngoal: Make this static personal blog page noticeably more beautiful while keeping it lightweight and fast.\nconstraints:\n  - Only edit files inside the current project folder\n  - Keep it static HTML/CSS with no framework\n  - Keep CSS concise and avoid heavy visual effects\n  - Improve mobile readability\nnext_action: codex_execute",
+  "parsed": {
+    "project_id": "personal_blog_smoke",
+    "cycle_id": "010",
+    "stage": "strategy",
+    "goal": "Make this static personal blog page noticeably more beautiful while keeping it lightweight and fast.",
+    "constraints": [
+      "Only edit files inside the current project folder",
+      "Keep it static HTML/CSS with no framework",
+      "Keep CSS concise and avoid heavy visual effects",
+      "Improve mobile readability"
+    ],
+    "next_action": "codex_execute"
+  },
+  "meta": {
+    "test_case": "e2e_web_loop_cycle_1"
+  }
+}
