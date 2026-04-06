@@ -1,0 +1,33 @@
+{
+  "packet_id": "pkt_20260402_7f27c583",
+  "packet_version": "v1",
+  "packet_type": "context",
+  "project_id": "mini_math_real_demo",
+  "cycle_id": "001",
+  "stage": "context",
+  "source": "codex-real-adapter",
+  "parent_packet_id": "pkt_20260402_c0723bab",
+  "created_at": "2026-04-02T10:51:01.641Z",
+  "status": "completed",
+  "raw_text": "{\n  \"current_goal\": \"Update mini_math to export multiply and pass tests.\",\n  \"completed\": [\n    \"Implemented `multiply(a, b)` export.\",\n    \"Ensured `npm test` passes under workspace constraints.\"\n  ],\n  \"key_files\": [\n    \"D:\\\\Projects\\\\Agent\\\\Brain_hub\\\\local_hub_v2\\\\demo_projects\\\\mini_math\\\\src\\\\sum.js\",\n    \"D:\\\\Projects\\\\Agent\\\\Brain_hub\\\\local_hub_v2\\\\demo_projects\\\\mini_math\\\\package.json\",\n    \"D:\\\\Projects\\\\Agent\\\\Brain_hub\\\\local_hub_v2\\\\demo_projects\\\\mini_math\\\\test\\\\sum.test.js\"\n  ],\n  \"latest_verification\": [\n    \"`npm test` succeeded: 2 tests passed.\"\n  ],\n  \"open_questions\": [],\n  \"risks\": [],\n  \"suggested_next_step\": \"Proceed to the next strategy packet action.\",\n  \"web_recovery_prompt\": \"If tests fail in another environment, re-run with `node --test` first; keep `--test-isolation=none` only where spawn permissions are restricted.\"\n}",
+  "parsed": {
+    "current_goal": "Update mini_math to export multiply and pass tests.",
+    "completed": [
+      "Implemented `multiply(a, b)` export.",
+      "Ensured `npm test` passes under workspace constraints."
+    ],
+    "key_files": [
+      "D:\\Projects\\Agent\\Brain_hub\\local_hub_v2\\demo_projects\\mini_math\\src\\sum.js",
+      "D:\\Projects\\Agent\\Brain_hub\\local_hub_v2\\demo_projects\\mini_math\\package.json",
+      "D:\\Projects\\Agent\\Brain_hub\\local_hub_v2\\demo_projects\\mini_math\\test\\sum.test.js"
+    ],
+    "latest_verification": [
+      "`npm test` succeeded: 2 tests passed."
+    ],
+    "open_questions": [],
+    "risks": [],
+    "suggested_next_step": "Proceed to the next strategy packet action.",
+    "web_recovery_prompt": "If tests fail in another environment, re-run with `node --test` first; keep `--test-isolation=none` only where spawn permissions are restricted."
+  },
+  "meta": {}
+}

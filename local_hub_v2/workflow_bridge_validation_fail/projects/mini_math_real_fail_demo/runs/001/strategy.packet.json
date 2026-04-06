@@ -1,0 +1,24 @@
+{
+  "packet_id": "pkt_20260402_4bba07af",
+  "packet_version": "v1",
+  "packet_type": "strategy",
+  "project_id": "mini_math_real_fail_demo",
+  "cycle_id": "001",
+  "stage": "strategy",
+  "source": "edge-extension",
+  "parent_packet_id": null,
+  "created_at": "2026-04-02T10:51:24.885Z",
+  "status": "pending",
+  "raw_text": "project_id: mini_math_real_fail_demo\ncycle_id: 001\nstage: strategy\ngoal: Validate failure callback path for real adapter.\nconstraints:\n  - Do not skip callback\nnext_action: codex_execute",
+  "parsed": {
+    "project_id": "mini_math_real_fail_demo",
+    "cycle_id": "001",
+    "stage": "strategy",
+    "goal": "Validate failure callback path for real adapter.",
+    "constraints": [
+      "Do not skip callback"
+    ],
+    "next_action": "codex_execute"
+  },
+  "meta": {}
+}

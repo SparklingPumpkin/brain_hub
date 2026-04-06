@@ -1,0 +1,31 @@
+{
+  "packet_id": "pkt_20260402_e4ce3a22",
+  "packet_version": "v1",
+  "packet_type": "execution",
+  "project_id": "mini_math_real_fail_demo",
+  "cycle_id": "001",
+  "stage": "execution",
+  "source": "codex-real-adapter",
+  "parent_packet_id": "pkt_20260402_4bba07af",
+  "created_at": "2026-04-02T10:51:25.191Z",
+  "status": "blocked",
+  "raw_text": "{\n  \"changed_files\": [\n    \"package.json\",\n    \"src/sum.js\"\n  ],\n  \"summary\": [\n    \"Codex CLI execution failed before completion.\"\n  ],\n  \"verification\": [],\n  \"open_issues\": [\n    \"spawn codex_not_exists ENOENT\"\n  ],\n  \"risks\": [\n    \"spawn codex_not_exists ENOENT\"\n  ],\n  \"next_step\": \"manual_review_required\"\n}",
+  "parsed": {
+    "changed_files": [
+      "package.json",
+      "src/sum.js"
+    ],
+    "summary": [
+      "Codex CLI execution failed before completion."
+    ],
+    "verification": [],
+    "open_issues": [
+      "spawn codex_not_exists ENOENT"
+    ],
+    "risks": [
+      "spawn codex_not_exists ENOENT"
+    ],
+    "next_step": "manual_review_required"
+  },
+  "meta": {}
+}

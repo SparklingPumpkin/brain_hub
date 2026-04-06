@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CodexExecutionOutput",
+  "type": "object",
+  "required": ["execution_report", "context_pack", "status"],
+  "additionalProperties": false,
+  "properties": {
+    "execution_report": {
+      "type": "object",
+      "required": [
+        "changed_files",
+        "summary",
+        "verification",
+        "open_issues",
+        "risks",
+        "next_step"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "changed_files": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "summary": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "verification": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "open_issues": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "risks": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "next_step": {
+          "type": "string"
+        }
+      }
+    },
+    "context_pack": {
+      "type": "object",
+      "required": [
+        "current_goal",
+        "completed",
+        "key_files",
+        "latest_verification",
+        "open_questions",
+        "risks",
+        "suggested_next_step",
+        "web_recovery_prompt"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "current_goal": {
+          "type": "string"
+        },
+        "completed": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "key_files": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "latest_verification": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "risks": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "suggested_next_step": {
+          "type": "string"
+        },
+        "web_recovery_prompt": {
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["completed", "needs_review", "blocked"]
+    }
+  }
+}
