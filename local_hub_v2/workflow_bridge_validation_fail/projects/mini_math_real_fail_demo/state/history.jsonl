@@ -1,0 +1,4 @@
+{"timestamp":"2026-04-02T10:51:24.897Z","event":"strategy_received","project_id":"mini_math_real_fail_demo","cycle_id":"001","run_id":"run_mini_math_real_fail_demo_001","status":"pending","packet_id":"pkt_20260402_4bba07af"}
+{"timestamp":"2026-04-02T10:51:24.911Z","event":"run_dispatched","project_id":"mini_math_real_fail_demo","cycle_id":"001","run_id":"run_mini_math_real_fail_demo_001","status":"dispatched"}
+{"timestamp":"2026-04-02T10:51:24.916Z","event":"run_running","project_id":"mini_math_real_fail_demo","cycle_id":"001","run_id":"run_mini_math_real_fail_demo_001","status":"running"}
+{"timestamp":"2026-04-02T10:51:25.200Z","event":"codex_result_received","project_id":"mini_math_real_fail_demo","cycle_id":"001","run_id":"run_mini_math_real_fail_demo_001","status":"blocked","execution_packet_id":"pkt_20260402_e4ce3a22","context_pack_id":"pkt_20260402_ae61e752"}

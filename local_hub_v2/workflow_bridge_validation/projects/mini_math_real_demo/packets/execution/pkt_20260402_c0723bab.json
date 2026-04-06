@@ -1,0 +1,31 @@
+{
+  "packet_id": "pkt_20260402_c0723bab",
+  "packet_version": "v1",
+  "packet_type": "execution",
+  "project_id": "mini_math_real_demo",
+  "cycle_id": "001",
+  "stage": "execution",
+  "source": "codex-real-adapter",
+  "parent_packet_id": "pkt_20260402_001ef9ed",
+  "created_at": "2026-04-02T10:51:01.641Z",
+  "status": "completed",
+  "raw_text": "{\n  \"changed_files\": [\n    \"D:\\\\Projects\\\\Agent\\\\Brain_hub\\\\local_hub_v2\\\\demo_projects\\\\mini_math\\\\src\\\\sum.js\",\n    \"D:\\\\Projects\\\\Agent\\\\Brain_hub\\\\local_hub_v2\\\\demo_projects\\\\mini_math\\\\package.json\"\n  ],\n  \"summary\": [\n    \"Added and exported `multiply(a, b)` in `src/sum.js`.\",\n    \"Adjusted test script to `node --test --test-isolation=none` so `npm test` runs in this environment.\",\n    \"All tests now pass.\"\n  ],\n  \"verification\": [\n    \"Ran `npm test` in `D:\\\\Projects\\\\Agent\\\\Brain_hub\\\\local_hub_v2\\\\demo_projects\\\\mini_math` with 2 passing, 0 failing.\"\n  ],\n  \"open_issues\": [],\n  \"risks\": [],\n  \"next_step\": \"Ready for next cycle/task.\"\n}",
+  "parsed": {
+    "changed_files": [
+      "D:\\Projects\\Agent\\Brain_hub\\local_hub_v2\\demo_projects\\mini_math\\src\\sum.js",
+      "D:\\Projects\\Agent\\Brain_hub\\local_hub_v2\\demo_projects\\mini_math\\package.json"
+    ],
+    "summary": [
+      "Added and exported `multiply(a, b)` in `src/sum.js`.",
+      "Adjusted test script to `node --test --test-isolation=none` so `npm test` runs in this environment.",
+      "All tests now pass."
+    ],
+    "verification": [
+      "Ran `npm test` in `D:\\Projects\\Agent\\Brain_hub\\local_hub_v2\\demo_projects\\mini_math` with 2 passing, 0 failing."
+    ],
+    "open_issues": [],
+    "risks": [],
+    "next_step": "Ready for next cycle/task."
+  },
+  "meta": {}
+}

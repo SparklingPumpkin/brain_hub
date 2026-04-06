@@ -1,0 +1,31 @@
+{
+  "packet_id": "pkt_20260402_ae61e752",
+  "packet_version": "v1",
+  "packet_type": "context",
+  "project_id": "mini_math_real_fail_demo",
+  "cycle_id": "001",
+  "stage": "context",
+  "source": "codex-real-adapter",
+  "parent_packet_id": "pkt_20260402_e4ce3a22",
+  "created_at": "2026-04-02T10:51:25.191Z",
+  "status": "blocked",
+  "raw_text": "{\n  \"current_goal\": \"Validate failure callback path for real adapter.\",\n  \"completed\": [],\n  \"key_files\": [\n    \"package.json\",\n    \"src/sum.js\"\n  ],\n  \"latest_verification\": [],\n  \"open_questions\": [\n    \"Investigate Codex CLI failure and retry dispatch.\"\n  ],\n  \"risks\": [\n    \"spawn codex_not_exists ENOENT\"\n  ],\n  \"suggested_next_step\": \"Fix CLI/runtime issue and rerun dispatch.\",\n  \"web_recovery_prompt\": \"Retry project mini_math_real_fail_demo cycle 001 after resolving adapter error.\"\n}",
+  "parsed": {
+    "current_goal": "Validate failure callback path for real adapter.",
+    "completed": [],
+    "key_files": [
+      "package.json",
+      "src/sum.js"
+    ],
+    "latest_verification": [],
+    "open_questions": [
+      "Investigate Codex CLI failure and retry dispatch."
+    ],
+    "risks": [
+      "spawn codex_not_exists ENOENT"
+    ],
+    "suggested_next_step": "Fix CLI/runtime issue and rerun dispatch.",
+    "web_recovery_prompt": "Retry project mini_math_real_fail_demo cycle 001 after resolving adapter error."
+  },
+  "meta": {}
+}

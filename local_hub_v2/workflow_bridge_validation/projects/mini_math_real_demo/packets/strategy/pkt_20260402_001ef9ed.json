@@ -1,0 +1,27 @@
+{
+  "packet_id": "pkt_20260402_001ef9ed",
+  "packet_version": "v1",
+  "packet_type": "strategy",
+  "project_id": "mini_math_real_demo",
+  "cycle_id": "001",
+  "stage": "strategy",
+  "source": "edge-extension",
+  "parent_packet_id": null,
+  "created_at": "2026-04-02T10:47:46.023Z",
+  "status": "pending",
+  "raw_text": "project_id: mini_math_real_demo\ncycle_id: 001\nstage: strategy\ngoal: Update demo_projects/mini_math/src/sum.js to export multiply(a, b), and make demo_projects/mini_math/test/sum.test.js pass.\nconstraints:\n  - Only edit files under demo_projects/mini_math\n  - Run npm test in demo_projects/mini_math\nnext_action: codex_execute",
+  "parsed": {
+    "project_id": "mini_math_real_demo",
+    "cycle_id": "001",
+    "stage": "strategy",
+    "goal": "Update demo_projects/mini_math/src/sum.js to export multiply(a, b), and make demo_projects/mini_math/test/sum.test.js pass.",
+    "constraints": [
+      "Only edit files under demo_projects/mini_math",
+      "Run npm test in demo_projects/mini_math"
+    ],
+    "next_action": "codex_execute"
+  },
+  "meta": {
+    "page_url": "https://chatgpt.com/local-hub-v2-demo"
+  }
+}
