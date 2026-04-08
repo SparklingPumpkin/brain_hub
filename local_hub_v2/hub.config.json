@@ -9,6 +9,10 @@
   "project_workdirs": {
     "personal_blog_smoke": "./demo_projects/personal_blog_smoke"
   },
+  "default_session_mode": "new",
+  "remote_control_enabled": false,
+  "remote_control_token": null,
+  "remote_control_title": "Local Hub Remote",
   "allow_remote_worker": false,
   "approval_policy": "manual_on_risk",
   "log_level": "info",

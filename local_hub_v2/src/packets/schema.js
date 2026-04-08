@@ -10,6 +10,7 @@ export const RUN_STATUSES = [
 ];
 
 export const PACKET_TYPES = ["strategy", "execution", "context"];
+export const SESSION_MODES = ["new", "resume", "project", "last"];
 
 function requireString(value, fieldName, errors) {
   if (typeof value !== "string" || value.trim() === "") {
@@ -38,9 +39,23 @@ export function validateStrategyParsed(parsed) {
   const stage = requireString(parsed.stage, "stage", errors);
   const goal = requireString(parsed.goal, "goal", errors);
   const nextAction = requireString(parsed.next_action, "next_action", errors);
+  const sessionId =
+    typeof parsed.session_id === "string" ? parsed.session_id.trim() : null;
+  const rawSessionMode =
+    typeof parsed.session_mode === "string" ? parsed.session_mode.trim() : "";
+  const sessionMode = rawSessionMode || "new";
 
   if (stage && stage !== "strategy") {
     errors.push("stage must be strategy");
+  }
+  if (rawSessionMode && !SESSION_MODES.includes(rawSessionMode)) {
+    errors.push(`session_mode must be one of: ${SESSION_MODES.join(", ")}`);
+  }
+  if (sessionId && sessionMode === "new") {
+    errors.push("session_id requires session_mode resume or project");
+  }
+  if (sessionMode === "resume" && !sessionId) {
+    errors.push("session_id is required when session_mode is resume");
   }
 
   return {
@@ -53,6 +68,8 @@ export function validateStrategyParsed(parsed) {
       goal,
       constraints: normalizeStringArray(parsed.constraints),
       next_action: nextAction,
+      session_mode: sessionMode,
+      session_id: sessionId,
     },
   };
 }
@@ -62,6 +79,10 @@ export function validateCodexPayload(body) {
   const projectId = requireString(body.project_id, "project_id", errors);
   const cycleId = requireString(body.cycle_id, "cycle_id", errors);
   const source = requireString(body.source, "source", errors);
+  const codexSessionId =
+    typeof body.codex_session_id === "string"
+      ? body.codex_session_id.trim()
+      : null;
   const requestedStatus =
     typeof body.status === "string" ? body.status.trim() : "completed";
 
@@ -82,6 +103,7 @@ export function validateCodexPayload(body) {
       status: requestedStatus || "completed",
       execution_report: body.execution_report ?? null,
       context_pack: body.context_pack ?? null,
+      codex_session_id: codexSessionId,
     },
   };
 }

@@ -24,8 +24,24 @@ export async function readJsonBody(request) {
   }
 }
 
-export function sendJson(response, statusCode, payload) {
+export function sendResponse(response, { statusCode, body, headers = {} }) {
   response.statusCode = statusCode;
+  for (const [key, value] of Object.entries(headers)) {
+    response.setHeader(key, value);
+  }
+
+  if (typeof body === "string" || Buffer.isBuffer(body)) {
+    response.end(body);
+    return;
+  }
+
   response.setHeader("Content-Type", "application/json; charset=utf-8");
-  response.end(JSON.stringify(payload, null, 2));
+  response.end(JSON.stringify(body, null, 2));
+}
+
+export function sendJson(response, statusCode, payload) {
+  sendResponse(response, {
+    statusCode,
+    body: payload,
+  });
 }

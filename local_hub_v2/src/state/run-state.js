@@ -5,6 +5,8 @@ export function createRunRecord({
   cycleId,
   strategyPacketId,
   dispatchMode,
+  sessionMode,
+  sessionId,
 }) {
   const timestamp = nowIso();
   return {
@@ -16,6 +18,9 @@ export function createRunRecord({
     execution_packet_id: null,
     context_pack_id: null,
     dispatch_mode: dispatchMode,
+    session_mode: sessionMode ?? "new",
+    session_id: sessionId ?? null,
+    codex_session_id: null,
     assigned_worker: null,
     attempt_count: 0,
     created_at: timestamp,
@@ -24,7 +29,13 @@ export function createRunRecord({
   };
 }
 
-export function refreshRunForStrategy(existingRun, strategyPacketId, dispatchMode) {
+export function refreshRunForStrategy(
+  existingRun,
+  strategyPacketId,
+  dispatchMode,
+  sessionMode,
+  sessionId
+) {
   const timestamp = nowIso();
   if (!existingRun) {
     return null;
@@ -35,6 +46,8 @@ export function refreshRunForStrategy(existingRun, strategyPacketId, dispatchMod
     status: "pending",
     strategy_packet_id: strategyPacketId,
     dispatch_mode: dispatchMode,
+    session_mode: sessionMode ?? existingRun.session_mode ?? "new",
+    session_id: sessionId ?? existingRun.session_id ?? null,
     updated_at: timestamp,
     last_error: null,
   };
@@ -69,12 +82,13 @@ export function markRunFailed(runRecord, status, errorMessage) {
 
 export function attachCodexResults(
   runRecord,
-  { executionPacketId, contextPackId, status }
+  { executionPacketId, contextPackId, status, codexSessionId }
 ) {
   return {
     ...runRecord,
     execution_packet_id: executionPacketId ?? runRecord.execution_packet_id,
     context_pack_id: contextPackId ?? runRecord.context_pack_id,
+    codex_session_id: codexSessionId ?? runRecord.codex_session_id ?? null,
     status,
     updated_at: nowIso(),
     last_error: null,

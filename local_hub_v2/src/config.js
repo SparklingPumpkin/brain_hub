@@ -14,6 +14,10 @@ const DEFAULT_CONFIG = {
   version: "v2-alpha",
   default_project_workdir_root: null,
   project_workdirs: {},
+  default_session_mode: "new",
+  remote_control_enabled: false,
+  remote_control_token: null,
+  remote_control_title: "Local Hub Remote",
 };
 
 function resolveOptionalPath(projectRoot, value) {
@@ -83,6 +87,23 @@ export async function loadConfig({
         merged.project_workdirs ??
         DEFAULT_CONFIG.project_workdirs
     ),
+    defaultSessionMode:
+      merged.defaultSessionMode ??
+      merged.default_session_mode ??
+      DEFAULT_CONFIG.default_session_mode,
+    remoteControlEnabled: Boolean(
+      merged.remoteControlEnabled ??
+        merged.remote_control_enabled ??
+        DEFAULT_CONFIG.remote_control_enabled
+    ),
+    remoteControlToken:
+      merged.remoteControlToken ??
+      merged.remote_control_token ??
+      DEFAULT_CONFIG.remote_control_token,
+    remoteControlTitle:
+      merged.remoteControlTitle ??
+      merged.remote_control_title ??
+      DEFAULT_CONFIG.remote_control_title,
   };
   config.hubUrl = `http://${config.host}:${config.port}`;
   return config;

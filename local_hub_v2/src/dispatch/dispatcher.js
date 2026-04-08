@@ -68,11 +68,21 @@ export async function dispatchToCodex(context, { projectId, cycleId }) {
   );
 
   try {
+    const projectState = await store.getProjectState(projectId);
+    const effectiveSessionMode =
+      currentRun.session_mode ?? config.defaultSessionMode ?? "new";
+    const effectiveSessionId =
+      effectiveSessionMode === "project"
+        ? projectState?.latest_codex_session_id ?? null
+        : currentRun.session_id ?? null;
+
     await runLocalAdapter({
       config,
       inputPath: store.getRunStrategyPacketPath(projectId, cycleId),
       projectId,
       cycleId,
+      sessionMode: effectiveSessionMode,
+      sessionId: effectiveSessionId,
     });
     const latestRun = await store.getRunRecord(projectId, cycleId);
     return latestRun ?? runningRun;

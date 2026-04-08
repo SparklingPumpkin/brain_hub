@@ -137,5 +137,6 @@ export function normalizeCodexSubmission(body) {
     finalStatus,
     executionPacket,
     contextPacket,
+    codexSessionId: normalized.codex_session_id,
   };
 }

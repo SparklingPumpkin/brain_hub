@@ -28,10 +28,13 @@ async function startHub({
   fakeMode,
   projectRoot,
 }) {
+  const fakeCodexPath = path
+    .join(projectRoot, "test", "fixtures", "fake-codex-cli.js")
+    .replaceAll("\\", "/");
   const adapterCommand = [
     "node ./adapters/real-codex-adapter.js",
-    `--workspace "${workspace}"`,
-    `--codex-cmd "node ./test/fixtures/fake-codex-cli.js --mode ${fakeMode}"`,
+    `--workdir "${workspace}"`,
+    `--codex-cmd "node ${fakeCodexPath} --mode ${fakeMode}"`,
   ].join(" ");
 
   const hub = await createHubServer({
@@ -39,6 +42,8 @@ async function startHub({
     root_dir: "./workflow_bridge",
     rootDir: path.join(tempRoot, "workflow_bridge"),
     projectRoot,
+    default_project_workdir_root: null,
+    project_workdirs: {},
     codex_adapter_cmd: adapterCommand,
   });
   await hub.start();
@@ -110,6 +115,88 @@ test("real adapter success path posts completed codex packet", async () => {
     assert.match(
       latestExecution.packet.parsed.summary.join("\n"),
       /Implemented multiply helper/
+    );
+
+    const stateResponse = await fetch(`${baseUrl}/projects/demo_real_ok/state`);
+    const stateBody = await stateResponse.json();
+    assert.equal(
+      stateBody.state.latest_codex_session_id,
+      "11111111-1111-1111-1111-111111111111"
+    );
+  } finally {
+    await hub.stop();
+    await fs.rm(tempRoot, { recursive: true, force: true });
+  }
+});
+
+test("real adapter stores explicit resume session on the run", async () => {
+  const tempRoot = await fs.mkdtemp(
+    path.join(os.tmpdir(), "local-hub-v2-real-session-")
+  );
+  const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const workspace = await createWorkspace(tempRoot);
+  const hub = await startHub({
+    tempRoot,
+    workspace,
+    fakeMode: "success",
+    projectRoot,
+  });
+
+  try {
+    const baseUrl = `http://127.0.0.1:${hub.address().port}`;
+    const response = await fetch(`${baseUrl}/packets/web`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        source: "edge-extension",
+        packet: [
+          "project_id: demo_real_session",
+          "cycle_id: 001",
+          "stage: strategy",
+          "goal: Reuse a codex session for a second run",
+          "constraints:",
+          "  - Keep API contract stable",
+          "session_mode: resume",
+          "session_id: 22222222-2222-2222-2222-222222222222",
+          "next_action: codex_execute",
+        ].join("\n"),
+      }),
+    });
+    assert.equal(response.status, 200);
+
+    const dispatchResponse = await fetch(
+      `${baseUrl}/runs/demo_real_session/001/dispatch`,
+      { method: "POST" }
+    );
+    assert.equal(dispatchResponse.status, 200);
+
+    const stateResponse = await fetch(`${baseUrl}/projects/demo_real_session/state`);
+    const stateBody = await stateResponse.json();
+    assert.equal(
+      stateBody.state.latest_codex_session_id,
+      "22222222-2222-2222-2222-222222222222"
+    );
+
+    const runFile = path.join(
+      tempRoot,
+      "workflow_bridge",
+      "projects",
+      "demo_real_session",
+      "runs",
+      "001",
+      "run.json"
+    );
+    const runRecord = JSON.parse(await fs.readFile(runFile, "utf8"));
+    assert.equal(runRecord.session_mode, "resume");
+    assert.equal(
+      runRecord.session_id,
+      "22222222-2222-2222-2222-222222222222"
+    );
+    assert.equal(
+      runRecord.codex_session_id,
+      "22222222-2222-2222-2222-222222222222"
     );
   } finally {
     await hub.stop();

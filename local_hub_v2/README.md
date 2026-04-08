@@ -84,9 +84,58 @@ npm test
 
 - 读取 `strategy.packet.json`
 - 调用 `codex exec`
+- 支持 `session_mode/session_id`，可指定或复用 Codex 会话
 - 要求 Codex 按 JSON Schema 输出 `execution_report`、`context_pack`、`status`
 - 自动回传到 `POST /packets/codex`
 - 自动把 `project_id` 解析到对应工作目录，再执行真实任务
+
+可选的 strategy 字段：
+
+```text
+session_mode: new|resume|project|last
+session_id: <uuid>
+```
+
+- `new`：默认，开新会话
+- `resume`：使用给定 `session_id`
+- `project`：优先复用项目最近一次成功记录的 Codex session；没有时会创建一个可复用的新会话
+- `last`：复用当前工作目录下最近一次 Codex 会话
+
+## 安卓 / Tailscale 远程控制
+
+Hub 现在支持一个独立的远程控制面板：
+
+- 页面：`GET /remote`
+- API：`/remote-api/*`
+
+要启用它，建议这样配置：
+
+```json
+{
+  "host": "0.0.0.0",
+  "remote_control_enabled": true,
+  "remote_control_token": "replace-with-a-long-random-token",
+  "remote_control_title": "Local Hub Remote"
+}
+```
+
+然后通过 Tailscale 访问你的机器地址，例如：
+
+```text
+http://<tailscale-ip>:8765/remote
+```
+
+远程面板支持：
+
+- 查看项目列表和当前状态
+- 查看最新 execution/context
+- 新建任务
+- 手动 dispatch 指定 run
+
+说明：
+
+- 现有浏览器扩展仍然继续走本地 `127.0.0.1`
+- 远程控制使用独立的 bearer token 鉴权，不会影响本地扩展
 
 ## 一键打开 ChatGPT 并准备 context-packet 提示词
 

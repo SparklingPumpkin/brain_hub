@@ -314,22 +314,78 @@ export function buildCodexPrompt(packet, { projectId, cycleId, workdir }) {
   ].join("\n");
 }
 
+function extractSessionId(text) {
+  const match = String(text ?? "").match(
+    /session id:\s*([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i
+  );
+  return match ? match[1] : null;
+}
+
+function normalizeSessionOptions(options) {
+  const sessionMode =
+    typeof options.sessionMode === "string" && options.sessionMode.trim()
+      ? options.sessionMode.trim()
+      : "new";
+  const sessionId =
+    typeof options.sessionId === "string" && options.sessionId.trim()
+      ? options.sessionId.trim()
+      : null;
+
+  return {
+    sessionMode,
+    sessionId,
+    persistSession:
+      sessionMode === "project" ||
+      sessionMode === "last" ||
+      sessionMode === "resume" ||
+      Boolean(sessionId),
+  };
+}
+
 function buildCodexExecInvocation(options) {
   const baseCommand = splitCommandLine(options.codexExecCommand ?? "codex exec");
   const [command, ...baseArgs] = baseCommand;
-  const args = [...baseArgs];
+  const session = normalizeSessionOptions(options);
+  const commandName = path.basename(command).toLowerCase();
+  const hasExplicitExecSubcommand = baseArgs[0] === "exec";
+  const looksLikeCodex = commandName.startsWith("codex");
 
-  args.push("--output-schema", options.schemaPath);
-  args.push("-o", options.outputPath);
-  args.push("--cd", options.workdir);
-  args.push("--color", "never");
-  args.push("--ephemeral");
+  if (!looksLikeCodex && !hasExplicitExecSubcommand) {
+    const args = [...baseArgs, "-o", options.outputPath, "--cd", options.workdir];
+    if (session.sessionMode) {
+      args.push("--session-mode", session.sessionMode);
+    }
+    if (session.sessionId) {
+      args.push("--session-id", session.sessionId);
+    }
+    return { command, args, session };
+  }
+
+  const execBaseArgs = hasExplicitExecSubcommand ? baseArgs.slice(1) : baseArgs;
+  const args = [];
+  if (session.sessionMode === "resume") {
+    args.push("exec", "resume", session.sessionId);
+  } else if (session.sessionMode === "last") {
+    args.push("exec", "resume", "--last");
+  } else {
+    args.push("exec");
+  }
+
+  args.push(...execBaseArgs);
 
   if (options.skipGitRepoCheck) {
     args.push("--skip-git-repo-check");
   }
 
-  if (options.sandbox) {
+  if (options.sessionMode === "new" || !options.sessionMode) {
+    args.push("--output-schema", options.schemaPath);
+    args.push("--cd", options.workdir);
+    args.push("--color", "never");
+  }
+
+  args.push("-o", options.outputPath);
+
+  if ((options.sessionMode === "new" || !options.sessionMode) && options.sandbox) {
     args.push("--sandbox", options.sandbox);
   }
 
@@ -341,11 +397,16 @@ function buildCodexExecInvocation(options) {
     args.push("--profile", options.profile);
   }
 
+  if (!session.persistSession) {
+    args.push("--ephemeral");
+  }
+
   args.push("-");
 
   return {
     command,
     args,
+    session,
   };
 }
 
@@ -359,6 +420,8 @@ export async function runCodexExec({
   model,
   profile,
   skipGitRepoCheck,
+  sessionMode,
+  sessionId,
 }) {
   const invocation = buildCodexExecInvocation({
       codexExecCommand,
@@ -369,6 +432,8 @@ export async function runCodexExec({
       model,
       profile,
       skipGitRepoCheck,
+      sessionMode,
+      sessionId,
   });
 
   return new Promise((resolve, reject) => {
@@ -425,16 +490,54 @@ async function postCodexResult(hubUrl, payload) {
   }
 }
 
+async function postFailureResult({
+  hubUrl,
+  projectId,
+  cycleId,
+  goal,
+  workdir,
+  errorMessage,
+  sessionId,
+}) {
+  await postCodexResult(hubUrl, {
+    project_id: projectId,
+    cycle_id: cycleId,
+    source: "codex-real-adapter",
+    execution_report: {
+      changed_files: [],
+      summary: ["Codex execution failed before producing a valid report."],
+      verification: [],
+      open_issues: [errorMessage],
+      risks: [errorMessage],
+      next_step: "manual_review_required",
+    },
+    context_pack: {
+      current_goal: goal,
+      completed: [],
+      key_files: [path.relative(workdir, workdir) || "."],
+      latest_verification: [],
+      open_questions: ["Review adapter logs and retry once the execution issue is fixed."],
+      risks: [errorMessage],
+      suggested_next_step: "Inspect the Codex CLI failure and decide whether to retry.",
+      web_recovery_prompt: "Codex execution failed before a valid result was produced. Review the adapter error, then retry or restate the task with a narrower scope.",
+    },
+    status: "blocked",
+    codex_session_id: sessionId ?? null,
+  });
+}
+
 export async function executeRealCodexAdapter(args) {
   if (!args.input || !args.hub || !args.project || !args.cycle) {
     throw new Error("Missing required adapter arguments");
   }
 
   const packet = JSON.parse(await fs.readFile(args.input, "utf8"));
-  const workdir = path.resolve(args.workdir ?? process.cwd());
+  const workdir = path.resolve(args.workdir ?? args.workspace ?? process.cwd());
   const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "local-hub-real-adapter-"));
   const schemaPath = path.join(tempDir, "codex-output-schema.json");
   const outputPath = path.join(tempDir, "codex-last-message.json");
+  const requestedSessionMode = args["session-mode"] ?? "new";
+  const requestedSessionId = args["session-id"] ?? null;
 
   try {
     await fs.writeFile(
@@ -450,7 +553,8 @@ export async function executeRealCodexAdapter(args) {
     });
 
     const execution = await runCodexExec({
-      codexExecCommand: args["codex-exec-cmd"] ?? "codex exec",
+      codexExecCommand:
+        args["codex-exec-cmd"] ?? args["codex-cmd"] ?? "codex exec",
       workdir,
       schemaPath,
       outputPath,
@@ -459,9 +563,17 @@ export async function executeRealCodexAdapter(args) {
       model: args.model,
       profile: args.profile,
       skipGitRepoCheck: Boolean(args["skip-git-repo-check"]),
+      sessionMode: requestedSessionMode,
+      sessionId: requestedSessionId,
     });
 
     const rawResponse = await fs.readFile(outputPath, "utf8").catch(() => "");
+    const codexSessionId =
+      extractSessionId(rawResponse) ??
+      extractSessionId(execution.stdout) ??
+      extractSessionId(execution.stderr) ??
+      args["session-id"] ??
+      null;
     const parsedResponse = normalizeModelResponse(
       parseJsonResponse(rawResponse || execution.stdout || execution.stderr)
     );
@@ -473,9 +585,27 @@ export async function executeRealCodexAdapter(args) {
       execution_report: parsedResponse.execution_report,
       context_pack: parsedResponse.context_pack,
       status: parsedResponse.status,
+      codex_session_id: codexSessionId,
     });
 
-    return parsedResponse;
+    return {
+      ...parsedResponse,
+      codex_session_id: codexSessionId,
+    };
+  } catch (error) {
+    await postFailureResult({
+      hubUrl: args.hub,
+      projectId: args.project,
+      cycleId: args.cycle,
+      goal: packet?.parsed?.goal ?? "Unknown goal",
+      workdir,
+      errorMessage: error.message,
+      sessionId: requestedSessionId,
+    });
+    return {
+      status: "blocked",
+      codex_session_id: requestedSessionId,
+    };
   } finally {
     await fs.rm(tempDir, { recursive: true, force: true });
   }

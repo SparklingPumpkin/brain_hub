@@ -1,3 +1,4 @@
+import fs from "node:fs/promises";
 import { appendLine, ensureDir, readJsonIfExists, writeJson } from "../utils/json.js";
 import { createPaths } from "./paths.js";
 
@@ -106,6 +107,33 @@ export function createFsStore(rootDir) {
         return null;
       }
       return this.getPacketRecord(projectId, "context", state.latest_context_pack_id);
+    },
+    async listProjectStates() {
+      try {
+        const entries = await fs.readdir(paths.projectsRoot, { withFileTypes: true });
+        const states = [];
+        for (const entry of entries) {
+          if (!entry.isDirectory()) {
+            continue;
+          }
+          const state = await readJsonIfExists(
+            paths.project(entry.name).currentStateFile
+          );
+          if (state) {
+            states.push(state);
+          }
+        }
+        return states.sort((left, right) =>
+          String(right.last_updated_at ?? "").localeCompare(
+            String(left.last_updated_at ?? "")
+          )
+        );
+      } catch (error) {
+        if (error.code === "ENOENT") {
+          return [];
+        }
+        throw error;
+      }
     },
   };
 }

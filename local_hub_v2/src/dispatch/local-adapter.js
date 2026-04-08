@@ -18,6 +18,8 @@ export async function runLocalAdapter({
   inputPath,
   projectId,
   cycleId,
+  sessionMode,
+  sessionId,
 }) {
   const [command, ...baseArgs] = splitCommand(config.codexAdapterCommand);
   const resolvedCommand = command === "node" ? process.execPath : command;
@@ -46,6 +48,14 @@ export async function runLocalAdapter({
 
   if (resolvedWorkdir && !hasExplicitWorkdir) {
     args.push("--workdir", resolvedWorkdir);
+  }
+
+  if (sessionMode) {
+    args.push("--session-mode", sessionMode);
+  }
+
+  if (sessionId) {
+    args.push("--session-id", sessionId);
   }
 
   return new Promise((resolve, reject) => {

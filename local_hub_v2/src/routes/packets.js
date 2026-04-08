@@ -27,13 +27,17 @@ export async function handleWebPacket(context, body) {
     refreshRunForStrategy(
       existingRun,
       packetRecord.packet_id,
-      context.config.defaultDispatchMode
+      context.config.defaultDispatchMode,
+      packetRecord.parsed.session_mode,
+      packetRecord.parsed.session_id
     ) ??
     createRunRecord({
       projectId: packetRecord.project_id,
       cycleId: packetRecord.cycle_id,
       strategyPacketId: packetRecord.packet_id,
       dispatchMode: context.config.defaultDispatchMode,
+      sessionMode: packetRecord.parsed.session_mode,
+      sessionId: packetRecord.parsed.session_id,
     });
 
   await context.store.savePacketRecord(packetRecord);
@@ -93,6 +97,7 @@ export async function handleCodexPacket(context, body) {
     executionPacketId: normalized.executionPacket?.packet_id ?? null,
     contextPackId: normalized.contextPacket?.packet_id ?? null,
     status: normalized.finalStatus,
+    codexSessionId: normalized.codexSessionId,
   });
 
   await context.store.saveRunRecord(updatedRun);

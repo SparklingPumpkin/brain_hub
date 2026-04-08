@@ -12,6 +12,8 @@ export function deriveProjectState(existingState, runRecord) {
       null,
     latest_context_pack_id:
       runRecord.context_pack_id ?? existingState?.latest_context_pack_id ?? null,
+    latest_codex_session_id:
+      runRecord.codex_session_id ?? existingState?.latest_codex_session_id ?? null,
     current_status: runRecord.status,
     last_updated_at: runRecord.updated_at ?? nowIso(),
   };

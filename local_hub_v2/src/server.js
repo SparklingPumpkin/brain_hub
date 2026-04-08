@@ -5,7 +5,7 @@ import { loadConfig } from "./config.js";
 import { routeRequest } from "./routes/router.js";
 import { createFsStore } from "./store/fs-store.js";
 import { HttpError } from "./utils/errors.js";
-import { readJsonBody, sendJson } from "./utils/http.js";
+import { readJsonBody, sendResponse } from "./utils/http.js";
 import { createLogger } from "./utils/logger.js";
 
 export async function createHubServer(overrides = {}) {
@@ -35,8 +35,10 @@ export async function createHubServer(overrides = {}) {
         method: request.method ?? "GET",
         url: request.url ?? "/",
         body,
+        headers: request.headers,
+        baseUrl: context.config.hubUrl,
       });
-      sendJson(response, result.statusCode, result.body);
+      sendResponse(response, result);
     } catch (error) {
       const statusCode = error instanceof HttpError ? error.statusCode : error.statusCode ?? 500;
       const details = error instanceof HttpError ? error.details : undefined;
@@ -44,11 +46,14 @@ export async function createHubServer(overrides = {}) {
         error: error.message,
         stack: error.stack,
       });
-      sendJson(response, statusCode, {
-        ok: false,
-        error: {
-          message: error.message,
-          details,
+      sendResponse(response, {
+        statusCode,
+        body: {
+          ok: false,
+          error: {
+            message: error.message,
+            details,
+          },
         },
       });
     }

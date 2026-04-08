@@ -42,7 +42,7 @@ async function ensureGitRepo(workspace) {
 async function main() {
   const options = parseArgs(process.argv);
   const outputFile = findArgValue(process.argv, "-o");
-  const workspace = findArgValue(process.argv, "-C");
+  const workspace = findArgValue(process.argv, "-C") ?? findArgValue(process.argv, "--cd");
 
   if (!outputFile || !workspace) {
     throw new Error("Missing -o or -C argument");
@@ -66,7 +66,7 @@ async function main() {
 
   const payload = {
     execution_report: {
-      changed_files: [],
+      changed_files: ["src/sum.js"],
       summary: ["Implemented multiply helper in src/sum.js."],
       verification: ["node --test"],
       open_issues: [],
@@ -87,6 +87,11 @@ async function main() {
   };
 
   await fs.writeFile(outputFile, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
+  if (options["emit-session-id"] !== "false") {
+    console.log(
+      `session id: ${options["session-id"] ?? "11111111-1111-1111-1111-111111111111"}`
+    );
+  }
 }
 
 main().catch((error) => {
